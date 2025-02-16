@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinanceManagmentApp.Domain\FinanceManagmentApp.Domain.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Services.Abstractions\FinanceManagmentApp.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Shared\FinanceManagmentApp.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -4,5 +4,6 @@
     {
         public ITransactionTypeRepository TransactionType { get; }
         public IFinancialOperationRepository FinancialOperation { get; }
+        public IUnitOfWork UnitOfWork { get; }
     }
 }

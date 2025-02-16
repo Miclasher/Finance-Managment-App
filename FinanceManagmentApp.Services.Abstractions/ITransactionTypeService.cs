@@ -8,6 +8,6 @@ namespace FinanceManagmentApp.Services.Abstractions
         Task<IEnumerable<TransactionTypeDTO>> GetAllAsync(CancellationToken cancellationToken = default);
         Task DeleteAsync(Guid targetId, CancellationToken cancellationToken = default);
         Task UpdateAsync(TransactionTypeForUpdateDTO transType, CancellationToken cancellationToken = default);
-        Task CreateAsync(TransactionTypeForCreateDTO transTpye, CancellationToken cancellationToken = default);
+        Task CreateAsync(TransactionTypeForCreateDTO transType, CancellationToken cancellationToken = default);
     }
 }

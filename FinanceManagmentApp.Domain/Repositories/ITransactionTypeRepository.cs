@@ -2,7 +2,5 @@
 
 namespace FinanceManagmentApp.Domain.Repositories
 {
-    public interface ITransactionTypeRepository : IRepository<TransactionType>
-    {
-    }
+    public interface ITransactionTypeRepository : IRepository<TransactionType>;
 }

@@ -2,7 +2,5 @@
 
 namespace FinanceManagmentApp.Domain.Repositories
 {
-    public interface IFinancialOperationRepository : IRepository<FinancialOperation>
-    {
-    }
+    public interface IFinancialOperationRepository : IRepository<FinancialOperation>;
 }

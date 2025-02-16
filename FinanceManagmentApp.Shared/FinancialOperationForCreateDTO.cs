@@ -5,12 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace FinanceManagmentApp.Shared
 {
-    public sealed class FinancialOperationForUpdateDTO
+    public sealed class FinancialOperationForCreateDTO
     {
-        [Required]
-        public Guid Id { get; set; }
         [Required]
         public decimal Amount { get; set; }
         [Required]

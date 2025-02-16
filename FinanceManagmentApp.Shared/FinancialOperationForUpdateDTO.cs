@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace FinanceManagmentApp.Shared
 {
-    public sealed class FinancialOperationDTO
+    public sealed class FinancialOperationForUpdateDTO
     {
         [Required]
         public Guid Id { get; set; }
@@ -20,6 +19,5 @@ namespace Shared
         public string? UserComment { get; set; }
         [Required]
         public Guid TransactionTypeId { get; set; }
-        public TransactionTypeDTO TransactionType { get; set; } = null!;
     }
 }

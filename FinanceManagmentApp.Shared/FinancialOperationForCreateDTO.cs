@@ -12,5 +12,7 @@ namespace FinanceManagmentApp.Shared
         public string? UserComment { get; set; }
         [Required]
         public Guid TransactionTypeId { get; set; }
+        [Required]
+        public Guid UserId { get; set; }
     }
 }

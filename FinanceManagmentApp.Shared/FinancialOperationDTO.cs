@@ -15,5 +15,8 @@ namespace FinanceManagmentApp.Shared
         [Required]
         public Guid TransactionTypeId { get; set; }
         public TransactionTypeDTO TransactionType { get; set; } = null!;
+        [Required]
+        public Guid UserId { get; set; }
+        public UserDTO User { get; set; } = null!;
     }
 }

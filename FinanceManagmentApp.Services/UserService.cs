@@ -29,7 +29,7 @@ namespace FinanceManagmentApp.Services
 
             var userToLogin = await _repositoryManager.User.GetByUsername(user.Username, cancellationToken);
 
-            if (userToLogin is null || HashUtility.VerifyPassword(user.Password, userToLogin.PasswordHash, userToLogin.Salt))
+            if (userToLogin is null || !HashUtility.VerifyPassword(user.Password, userToLogin.PasswordHash, userToLogin.Salt))
             {
                 throw new InvalidDataException("Invalid credentials");
             }

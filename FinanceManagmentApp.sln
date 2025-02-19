@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagmentApp.Service
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagmentApp.Shared", "FinanceManagmentApp.Shared\FinanceManagmentApp.Shared.csproj", "{3581C067-DF40-4F74-A4C3-F15073BE8B4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagmentApp.Infrastructure", "FinanceManagmentApp.Infrastructure\FinanceManagmentApp.Infrastructure.csproj", "{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{3581C067-DF40-4F74-A4C3-F15073BE8B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3581C067-DF40-4F74-A4C3-F15073BE8B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3581C067-DF40-4F74-A4C3-F15073BE8B4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{66A9F177-6B2B-4954-863F-26A947F9C3E1} = {95DCBCD8-2694-4315-B797-C059C9973E1A}
 		{459F73A2-0D48-42AE-889D-7E88E9E25580} = {95DCBCD8-2694-4315-B797-C059C9973E1A}
 		{3581C067-DF40-4F74-A4C3-F15073BE8B4B} = {F97C95FE-2F50-4756-A191-140A3E78CABF}
+		{56AF33FC-A8F3-4E2E-9A54-29E7B52D5E33} = {F97C95FE-2F50-4756-A191-140A3E78CABF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5D2CC977-E5CB-43F4-A694-CC88E2255915}

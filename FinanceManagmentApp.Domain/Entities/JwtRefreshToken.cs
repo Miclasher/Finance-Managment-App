@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FinanceManagmentApp.Domain.Entities
+﻿namespace FinanceManagmentApp.Domain.Entities
 {
     public sealed class JwtRefreshToken
     {

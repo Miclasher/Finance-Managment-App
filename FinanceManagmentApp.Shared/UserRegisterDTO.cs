@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FinanceManagmentApp.Shared
 {
-    public sealed class UserRegister
+    public sealed class UserRegisterDTO
     {
         [Required]
         [MaxLength(30)]

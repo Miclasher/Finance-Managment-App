@@ -3,13 +3,7 @@ using FinanceManagmentApp.Domain.Repositories;
 using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Services.Utilities;
 using FinanceManagmentApp.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FinanceManagmentApp.Services
 {
@@ -34,26 +28,42 @@ namespace FinanceManagmentApp.Services
                 throw new InvalidDataException("Invalid credentials");
             }
 
-            var refreshToken = _jwtProvider.GenerateRefreshToken();
+            var refreshToken = GenerateJwtTokenEntity(userToLogin.Id);
 
             await _repositoryManager.RefreshToken.ReplaceUserToken(userToLogin.Id, refreshToken, cancellationToken);
 
             return new AuthResponseDTO
             {
                 AccessToken = _jwtProvider.GenerateAccessToken(userToLogin.Id, userToLogin.Roles.Select(e => e.Name)),
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken.Token
             };
         }
 
-        public async Task<AuthResponseDTO> RegisterAsync(UserRegister newUser, CancellationToken cancellationToken = default)
+        public async Task<AuthResponseDTO> RegisterAsync(UserRegisterDTO newUser, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(newUser, nameof(newUser));
 
-            if (await _repositoryManager.User.UsernameExists(newUser.Username, cancellationToken))
-            {
-                throw new InvalidOperationException("Username is already taken");
-            }
+            await ValidateUserCredentials(newUser, cancellationToken);
 
+            User userToAdd = CreateNewUserEntity(newUser);
+
+            var refreshToken = GenerateJwtTokenEntity(userToAdd.Id);
+
+            await _repositoryManager.User.AddAsync(userToAdd, cancellationToken);
+
+            await _repositoryManager.RefreshToken.ReplaceUserToken(userToAdd.Id, refreshToken, cancellationToken);
+
+            await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            return new AuthResponseDTO
+            {
+                RefreshToken = refreshToken.Token,
+                AccessToken = _jwtProvider.GenerateAccessToken(userToAdd.Id, [])
+            };
+        }
+
+        private static User CreateNewUserEntity(UserRegisterDTO newUser)
+        {
             var saltBytes = RandomNumberGenerator.GetBytes(16);
 
             var hashedPassword = HashUtility.HashPassword(newUser.PlainPassword, saltBytes);
@@ -67,25 +77,27 @@ namespace FinanceManagmentApp.Services
                 Email = newUser.Email,
                 DisplayName = newUser.DisplayName
             };
-
-            var refreshToken = _jwtProvider.GenerateRefreshToken();
-
-            await _repositoryManager.User.AddAsync(userToAdd, cancellationToken);
-
-            await _repositoryManager.RefreshToken.ReplaceUserToken(userToAdd.Id, refreshToken, cancellationToken);
-
-            await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
-
-            return new AuthResponseDTO
-            {
-                RefreshToken = refreshToken,
-                AccessToken = _jwtProvider.GenerateAccessToken(userToAdd.Id, [])
-            };
+            return userToAdd;
         }
 
-        public Task UpdateAsync(UserForUpdateDTO user, CancellationToken cancellationToken = default)
+        private async Task ValidateUserCredentials(UserRegisterDTO newUser, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (await _repositoryManager.User.UsernameExists(newUser.Username, cancellationToken))
+            {
+                throw new InvalidOperationException("Username is already taken");
+            }
+        }
+
+        private JwtRefreshToken GenerateJwtTokenEntity(Guid userId)
+        {
+            return new JwtRefreshToken
+            {
+                Id = Guid.NewGuid(),
+                Token = _jwtProvider.GenerateRefreshToken(),
+                ExpiryDate = DateTime.UtcNow.AddDays(15),
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId
+            };
         }
     }
 }

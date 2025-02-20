@@ -7,11 +7,11 @@ using System.Security.Cryptography;
 
 namespace FinanceManagmentApp.Services
 {
-    public sealed class UserService : IUserService
+    public sealed class AuthService : IAuthService
     {
-        private readonly IJwtProvider _jwtProvider;
+        private readonly IJwtUtility _jwtProvider;
         private readonly IRepositoryManager _repositoryManager;
-        public UserService(IJwtProvider jwtProvider, IRepositoryManager repositoryManager)
+        public AuthService(IJwtUtility jwtProvider, IRepositoryManager repositoryManager)
         {
             _jwtProvider = jwtProvider;
             _repositoryManager = repositoryManager;

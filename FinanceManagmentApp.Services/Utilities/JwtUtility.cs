@@ -8,11 +8,11 @@ using System.Text;
 
 namespace FinanceManagmentApp.Services.Utilities
 {
-    internal sealed class JwtProvider : IJwtProvider
+    internal sealed class JwtUtility : IJwtUtility
     {
         private readonly IConfiguration _configuration;
 
-        public JwtProvider(IConfiguration configuration)
+        public JwtUtility(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -52,6 +52,18 @@ namespace FinanceManagmentApp.Services.Utilities
         public string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        }
+
+        public Guid GetUserIdFromJwt(ClaimsPrincipal claimsPrincipal)
+        {
+            var claim = claimsPrincipal.FindFirst("NameIdentifier");
+
+            if (claim is null)
+            {
+                throw new InvalidDataException("User id was not found in data from JWT token.");
+            }
+
+            return Guid.Parse(claim.Value);
         }
     }
 }

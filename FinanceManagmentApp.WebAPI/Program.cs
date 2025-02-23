@@ -4,6 +4,7 @@ using FinanceManagmentApp.Infrastructure.Repositories;
 using FinanceManagmentApp.Services;
 using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Services.Utilities;
+using FinanceManagmentApp.WebAPI.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -84,6 +85,8 @@ namespace FinanceManagmentApp.WebAPI
             });
 
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

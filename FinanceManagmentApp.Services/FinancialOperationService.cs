@@ -25,6 +25,12 @@ namespace FinanceManagmentApp.Services
 
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
+            var transactionTypes = await _repositoryManager.TransactionType.GetAllByUserAsync(userId, cancellationToken);
+            if (!transactionTypes.Any())
+            {
+                throw new InvalidOperationException("No transaction types available for the user. Cannot create financial operation.");
+            }
+
             var newFinOp = finOp.Adapt<FinancialOperation>();
 
             newFinOp.UserId = userId;

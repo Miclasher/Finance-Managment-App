@@ -30,6 +30,7 @@ namespace FinanceManagmentApp.Tests
         {
             var finOp = new FinancialOperationForCreateDTO { Amount = 100, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
+            _mockTransactionTypeRepository.Setup(r => r.GetAllByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<TransactionType> { new TransactionType { Id = finOp.TransactionTypeId } });
 
             await _financialOperationService.CreateAsync(_user, finOp);
 

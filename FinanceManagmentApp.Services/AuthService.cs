@@ -21,16 +21,22 @@ namespace FinanceManagmentApp.Services
         {
             ArgumentNullException.ThrowIfNull(user, nameof(user));
 
-            var userToLogin = await _repositoryManager.User.GetByUsername(user.Username, cancellationToken);
+            var userToLogin = await _repositoryManager.User.GetByUsernameAsync(user.Username, cancellationToken);
 
-            if (userToLogin is null || !HashUtility.VerifyPassword(user.Password, userToLogin.PasswordHash, userToLogin.Salt))
+            if(userToLogin is null)
             {
-                throw new InvalidDataException("Invalid credentials");
+                throw new InvalidDataException("Username not found");
+            }
+            else if (!HashUtility.VerifyPassword(user.Password, userToLogin.PasswordHash, userToLogin.Salt))
+            {
+                throw new InvalidDataException("Invalid password");
             }
 
             var refreshToken = GenerateJwtTokenEntity(userToLogin.Id);
 
-            await _repositoryManager.RefreshToken.ReplaceUserToken(userToLogin.Id, refreshToken, cancellationToken);
+            await _repositoryManager.RefreshToken.ReplaceUserTokenAsync(userToLogin.Id, refreshToken, cancellationToken);
+
+            await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             return new AuthResponseDTO
             {
@@ -43,7 +49,10 @@ namespace FinanceManagmentApp.Services
         {
             ArgumentNullException.ThrowIfNull(newUser, nameof(newUser));
 
-            await ValidateUserCredentials(newUser, cancellationToken);
+            if (await _repositoryManager.User.UsernameExistsAsync(newUser.Username, cancellationToken))
+            {
+                throw new InvalidOperationException("Username is already taken");
+            }
 
             User userToAdd = CreateNewUserEntity(newUser);
 
@@ -51,7 +60,7 @@ namespace FinanceManagmentApp.Services
 
             await _repositoryManager.User.AddAsync(userToAdd, cancellationToken);
 
-            await _repositoryManager.RefreshToken.ReplaceUserToken(userToAdd.Id, refreshToken, cancellationToken);
+            await _repositoryManager.RefreshToken.ReplaceUserTokenAsync(userToAdd.Id, refreshToken, cancellationToken);
 
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -59,6 +68,29 @@ namespace FinanceManagmentApp.Services
             {
                 RefreshToken = refreshToken.Token,
                 AccessToken = _jwtProvider.GenerateAccessToken(userToAdd.Id, [])
+            };
+        }
+
+        public async Task<AuthResponseDTO> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        {
+            var token = await _repositoryManager.RefreshToken.GetTokenAsync(refreshToken, cancellationToken);
+
+            if (token is null || token.User is null || token.ExpiryDate < DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Invalid token");
+            }
+
+            var roles = token.User.Roles.Select(e => e.Name);
+            var newRefreshToken = GenerateJwtTokenEntity(token.UserId);
+
+            await _repositoryManager.RefreshToken.ReplaceUserTokenAsync(token.UserId, newRefreshToken, cancellationToken);
+
+            await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            return new AuthResponseDTO
+            {
+                AccessToken = _jwtProvider.GenerateAccessToken(token.UserId, roles),
+                RefreshToken = newRefreshToken.Token
             };
         }
 
@@ -78,14 +110,6 @@ namespace FinanceManagmentApp.Services
                 DisplayName = newUser.DisplayName
             };
             return userToAdd;
-        }
-
-        private async Task ValidateUserCredentials(UserRegisterDTO newUser, CancellationToken cancellationToken)
-        {
-            if (await _repositoryManager.User.UsernameExists(newUser.Username, cancellationToken))
-            {
-                throw new InvalidOperationException("Username is already taken");
-            }
         }
 
         private JwtRefreshToken GenerateJwtTokenEntity(Guid userId)

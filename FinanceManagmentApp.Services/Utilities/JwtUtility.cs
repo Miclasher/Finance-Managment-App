@@ -8,7 +8,7 @@ using System.Text;
 
 namespace FinanceManagmentApp.Services.Utilities
 {
-    internal sealed class JwtUtility : IJwtUtility
+    public sealed class JwtUtility : IJwtUtility
     {
         private readonly IConfiguration _configuration;
 
@@ -19,12 +19,12 @@ namespace FinanceManagmentApp.Services.Utilities
 
         public string GenerateAccessToken(Guid userId, IEnumerable<string> roles)
         {
-            if (_configuration["Jwt:Secret"] is null || _configuration["Jwt:Audience"] is null || _configuration["Jwt:Issuer"] is null)
+            if (_configuration["Jwt:Key"] is null || _configuration["Jwt:Audience"] is null || _configuration["Jwt:Issuer"] is null)
             {
                 throw new InvalidOperationException("Cannot generate acces token because of missing Jwt configuration.");
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

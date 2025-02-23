@@ -2,7 +2,7 @@
 
 namespace FinanceManagmentApp.Services.Utilities
 {
-    internal static class HashUtility
+    public static class HashUtility
     {
         public static string HashPassword(string plainPassword, byte[] saltBytes)
         {

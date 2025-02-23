@@ -13,12 +13,18 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<JwtRefreshToken> GetUserToken(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<JwtRefreshToken> GetTokenAsync(string token, CancellationToken cancellationToken = default)
         {
-            return (await _context.RefreshTokens.Where(e => e.UserId == userId).FirstOrDefaultAsync(cancellationToken))!;
+            var tokenObject = await _context.RefreshTokens
+                .Include(e => e.User)
+                .ThenInclude(e => e.Roles)
+                .Where(e => e.Token == token)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return tokenObject!;
         }
 
-        public async Task InvalidateUserToken(Guid userId, CancellationToken cancellationToken = default)
+        public async Task InvalidateUserTokenAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             var tokenToInvalidate = await _context.RefreshTokens
                 .Where(e => e.UserId == userId)
@@ -32,11 +38,11 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             _context.RefreshTokens.Remove(tokenToInvalidate);
         }
 
-        public async Task ReplaceUserToken(Guid userId, JwtRefreshToken newToken, CancellationToken cancellationToken = default)
+        public async Task ReplaceUserTokenAsync(Guid userId, JwtRefreshToken newToken, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(newToken, nameof(newToken));
 
-            await InvalidateUserToken(userId, cancellationToken);
+            await InvalidateUserTokenAsync(userId, cancellationToken);
 
             await _context.RefreshTokens.AddAsync(newToken, cancellationToken);
         }

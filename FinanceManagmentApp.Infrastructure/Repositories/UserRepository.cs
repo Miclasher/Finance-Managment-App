@@ -15,12 +15,12 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             return (await _dbSet.Include(e => e.Roles).Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;
         }
 
-        public async Task<User> GetByUsername(string username, CancellationToken cancellationToken = default)
+        public async Task<User> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
         {
             return (await _dbSet.Where(e => e.Username == username).FirstOrDefaultAsync(cancellationToken))!;
         }
 
-        public async Task<bool> UsernameExists(string username, CancellationToken cancellationToken = default)
+        public async Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken = default)
         {
             return await _dbSet.Where(e => e.Username == username).AnyAsync(cancellationToken);
         }

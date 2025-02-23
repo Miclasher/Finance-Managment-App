@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceManagmentApp.Infrastructure.Migrations
 {
     [DbContext(typeof(FinanceManagmentAppContext))]
-    [Migration("20250223123914_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250223172735_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,30 +70,20 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.ToTable("RefreshTokens");
-                });
-
-            modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.Role", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
@@ -110,7 +100,12 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TransactionTypes");
                 });
@@ -149,21 +144,6 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("RoleUser", b =>
-                {
-                    b.Property<Guid>("RolesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("RolesId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("RoleUser");
-                });
-
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.FinancialOperation", b =>
                 {
                     b.HasOne("FinanceManagmentApp.Domain.Entities.TransactionType", "TransactionType")
@@ -175,7 +155,7 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.HasOne("FinanceManagmentApp.Domain.Entities.User", "User")
                         .WithMany("FinancialOperations")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("TransactionType");
@@ -183,19 +163,26 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RoleUser", b =>
+            modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.JwtRefreshToken", b =>
                 {
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RolesId")
+                    b.HasOne("FinanceManagmentApp.Domain.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("FinanceManagmentApp.Domain.Entities.JwtRefreshToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
+                {
+                    b.HasOne("FinanceManagmentApp.Domain.Entities.User", "User")
+                        .WithMany("TransactionTypes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
@@ -206,6 +193,8 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.User", b =>
                 {
                     b.Navigation("FinancialOperations");
+
+                    b.Navigation("TransactionTypes");
                 });
 #pragma warning restore 612, 618
         }

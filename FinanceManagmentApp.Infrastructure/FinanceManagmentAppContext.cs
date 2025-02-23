@@ -7,7 +7,6 @@ namespace FinanceManagmentApp.Infrastructure
     {
         public DbSet<User> Users { get; set; }
         public DbSet<JwtRefreshToken> RefreshTokens { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<FinancialOperation> FinancialOperations { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
 

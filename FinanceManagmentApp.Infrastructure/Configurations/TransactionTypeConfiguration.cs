@@ -17,6 +17,14 @@ namespace FinanceManagmentApp.Infrastructure.Configurations
             builder.Property(e => e.IsExpense)
                 .IsRequired();
 
+            builder.Property(e => e.UserId)
+                .IsRequired();
+
+            builder.HasOne(e => e.User)
+                .WithMany(e => e.TransactionTypes)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasMany(e => e.FinancialOperations)
                 .WithOne(e => e.TransactionType)
                 .HasForeignKey(e => e.TransactionTypeId);

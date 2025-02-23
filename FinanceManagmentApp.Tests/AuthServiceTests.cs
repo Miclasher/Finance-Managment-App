@@ -29,13 +29,12 @@ namespace FinanceManagmentApp.Tests
                 Id = Guid.NewGuid(),
                 Username = "testuser",
                 PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
-                Salt = "somesalt",
-                Roles = Enumerable.Empty<Role>()
+                Salt = "somesalt"
             };
 
             _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
-            _mockJwtUtility.Setup(j => j.GenerateAccessToken(user.Id, It.IsAny<IEnumerable<string>>()))
+            _mockJwtUtility.Setup(j => j.GenerateAccessToken(user.Id))
                 .Returns("accessToken");
             _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
                 .Returns("refreshToken");
@@ -57,7 +56,6 @@ namespace FinanceManagmentApp.Tests
                 Username = "testuser",
                 PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
                 Salt = "somesalt",
-                Roles = Enumerable.Empty<Role>()
             };
 
             _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
@@ -79,7 +77,7 @@ namespace FinanceManagmentApp.Tests
 
             _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
-            _mockJwtUtility.Setup(j => j.GenerateAccessToken(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>()))
+            _mockJwtUtility.Setup(j => j.GenerateAccessToken(It.IsAny<Guid>()))
                 .Returns("accessToken");
             _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
                 .Returns("refreshToken");

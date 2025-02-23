@@ -31,8 +31,10 @@ namespace FinanceManagmentApp.Infrastructure.Configurations
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserId);
 
-            builder.HasMany(e => e.Roles)
-                .WithMany(e => e.Users);
+            builder.HasMany(e => e.TransactionTypes)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

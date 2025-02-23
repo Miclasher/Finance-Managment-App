@@ -17,7 +17,7 @@ namespace FinanceManagmentApp.Services.Utilities
             _configuration = configuration;
         }
 
-        public string GenerateAccessToken(Guid userId, IEnumerable<string> roles)
+        public string GenerateAccessToken(Guid userId)
         {
             if (_configuration["Jwt:Key"] is null || _configuration["Jwt:Audience"] is null || _configuration["Jwt:Issuer"] is null)
             {
@@ -32,11 +32,6 @@ namespace FinanceManagmentApp.Services.Utilities
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             };
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
@@ -56,7 +51,7 @@ namespace FinanceManagmentApp.Services.Utilities
 
         public Guid GetUserIdFromJwt(ClaimsPrincipal claimsPrincipal)
         {
-            var claim = claimsPrincipal.FindFirst("NameIdentifier");
+            var claim = claimsPrincipal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
 
             if (claim is null)
             {

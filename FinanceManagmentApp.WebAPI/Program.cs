@@ -24,7 +24,10 @@ namespace FinanceManagmentApp.WebAPI
             builder.Services.AddDbContext<FinanceManagmentAppContext>(options
                 => options.UseSqlServer(builder.Configuration["DbConnectionString"]));
 
+            builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
             builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+
             builder.Services.AddScoped<IJwtUtility, JwtUtility>();
             builder.Services.Configure<JwtUtility>(builder.Configuration.GetSection("Jwt"));
 

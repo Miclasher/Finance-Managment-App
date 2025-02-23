@@ -40,7 +40,7 @@ namespace FinanceManagmentApp.Services
 
             return new AuthResponseDTO
             {
-                AccessToken = _jwtProvider.GenerateAccessToken(userToLogin.Id, userToLogin.Roles.Select(e => e.Name)),
+                AccessToken = _jwtProvider.GenerateAccessToken(userToLogin.Id),
                 RefreshToken = refreshToken.Token
             };
         }
@@ -67,7 +67,7 @@ namespace FinanceManagmentApp.Services
             return new AuthResponseDTO
             {
                 RefreshToken = refreshToken.Token,
-                AccessToken = _jwtProvider.GenerateAccessToken(userToAdd.Id, [])
+                AccessToken = _jwtProvider.GenerateAccessToken(userToAdd.Id)
             };
         }
 
@@ -80,7 +80,6 @@ namespace FinanceManagmentApp.Services
                 throw new InvalidOperationException("Invalid token");
             }
 
-            var roles = token.User.Roles.Select(e => e.Name);
             var newRefreshToken = GenerateJwtTokenEntity(token.UserId);
 
             await _repositoryManager.RefreshToken.ReplaceUserTokenAsync(token.UserId, newRefreshToken, cancellationToken);
@@ -89,7 +88,7 @@ namespace FinanceManagmentApp.Services
 
             return new AuthResponseDTO
             {
-                AccessToken = _jwtProvider.GenerateAccessToken(token.UserId, roles),
+                AccessToken = _jwtProvider.GenerateAccessToken(token.UserId),
                 RefreshToken = newRefreshToken.Token
             };
         }

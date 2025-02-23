@@ -15,7 +15,7 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             return await _dbSet.Include(e => e.TransactionType).ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<FinancialOperation>> GetAllByUser(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<FinancialOperation>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _dbSet.Where(e => e.UserId == userId).ToListAsync(cancellationToken);
         }

@@ -9,6 +9,6 @@
         public string Salt { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public IEnumerable<FinancialOperation> FinancialOperations { get; set; } = new List<FinancialOperation>();
-        public IEnumerable<Role> Roles { get; set; } = new List<Role>();
+        public IEnumerable<TransactionType> TransactionTypes { get; set; } = new List<TransactionType>();
     }
 }

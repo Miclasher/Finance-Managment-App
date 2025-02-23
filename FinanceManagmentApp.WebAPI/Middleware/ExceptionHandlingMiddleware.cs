@@ -24,7 +24,7 @@ namespace FinanceManagmentApp.WebAPI.Middleware
             {
                 ArgumentNullException => StatusCodes.Status400BadRequest,
                 InvalidOperationException => StatusCodes.Status400BadRequest,
-                AccessViolationException => StatusCodes.Status401Unauthorized,
+                AccessViolationException => StatusCodes.Status403Forbidden,
                 KeyNotFoundException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError
             };

@@ -17,7 +17,6 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         {
             var tokenObject = await _context.RefreshTokens
                 .Include(e => e.User)
-                .ThenInclude(e => e.Roles)
                 .Where(e => e.Token == token)
                 .FirstOrDefaultAsync(cancellationToken);
 

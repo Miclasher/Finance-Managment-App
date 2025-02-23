@@ -38,10 +38,9 @@ namespace FinanceManagmentApp.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public async Task CreateAsyncTest2()
         {
-            await _financialOperationService.CreateAsync(_user, null!);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _financialOperationService.CreateAsync(_user, null!));
         }
 
         [TestMethod]
@@ -58,23 +57,21 @@ namespace FinanceManagmentApp.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
         public async Task DeleteAsyncTest2()
         {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null);
+            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
 
-            await _financialOperationService.DeleteAsync(_user, Guid.NewGuid());
+            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.DeleteAsync(_user, Guid.NewGuid()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AccessViolationException))]
         public async Task DeleteAsyncTest3()
         {
             var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
             _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
 
-            await _financialOperationService.DeleteAsync(_user, finOp.Id);
+            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.DeleteAsync(_user, finOp.Id));
         }
 
         [TestMethod]
@@ -83,7 +80,7 @@ namespace FinanceManagmentApp.Tests
             var userId = Guid.NewGuid();
             var finOps = new List<FinancialOperation> { new FinancialOperation { Id = Guid.NewGuid(), UserId = userId } };
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
-            _mockFinancialOperationRepository.Setup(r => r.GetAllByUser(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
+            _mockFinancialOperationRepository.Setup(r => r.GetAllByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
 
             var result = await _financialOperationService.GetAllAsync(_user);
 
@@ -104,23 +101,21 @@ namespace FinanceManagmentApp.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
         public async Task GetByIdAsyncTest2()
         {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null);
+            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
 
-            await _financialOperationService.GetByIdAsync(_user, Guid.NewGuid());
+            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.GetByIdAsync(_user, Guid.NewGuid()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AccessViolationException))]
         public async Task GetByIdAsyncTest3()
         {
             var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
             _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
 
-            await _financialOperationService.GetByIdAsync(_user, finOp.Id);
+            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.GetByIdAsync(_user, finOp.Id));
         }
 
         [TestMethod]
@@ -140,25 +135,22 @@ namespace FinanceManagmentApp.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public async Task UpdateAsyncTest2()
         {
-            await _financialOperationService.UpdateAsync(_user, null!);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _financialOperationService.UpdateAsync(_user, null!));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
         public async Task UpdateAsyncTest3()
         {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null);
+            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
 
             var updateDto = new FinancialOperationForUpdateDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
 
-            await _financialOperationService.UpdateAsync(_user, updateDto);
+            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AccessViolationException))]
         public async Task UpdateAsyncTest4()
         {
             var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
@@ -167,7 +159,7 @@ namespace FinanceManagmentApp.Tests
 
             var updateDto = new FinancialOperationForUpdateDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
 
-            await _financialOperationService.UpdateAsync(_user, updateDto);
+            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
         }
     }
 }

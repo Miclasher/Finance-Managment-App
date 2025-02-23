@@ -21,6 +21,7 @@ namespace FinanceManagmentApp.Services
         public async Task CreateAsync(ClaimsPrincipal user, FinancialOperationForCreateDTO finOp, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(finOp);
+            ArgumentNullException.ThrowIfNull(user);
 
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
@@ -35,6 +36,7 @@ namespace FinanceManagmentApp.Services
 
         public async Task DeleteAsync(ClaimsPrincipal user, Guid targetId, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(user);
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
             var target = await _repositoryManager.FinancialOperation.GetByIdAsync(targetId, cancellationToken)
@@ -52,15 +54,19 @@ namespace FinanceManagmentApp.Services
 
         public async Task<IEnumerable<FinancialOperationDTO>> GetAllAsync(ClaimsPrincipal user, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(user);
+
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
-            var finOps = await _repositoryManager.FinancialOperation.GetAllByUser(userId, cancellationToken);
+            var finOps = await _repositoryManager.FinancialOperation.GetAllByUserAsync(userId, cancellationToken);
 
             return finOps.Adapt<IEnumerable<FinancialOperationDTO>>();
         }
 
         public async Task<FinancialOperationDTO> GetByIdAsync(ClaimsPrincipal user, Guid id, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(user);
+
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
             var finOp = await _repositoryManager.FinancialOperation.GetByIdAsync(id, cancellationToken)
@@ -76,6 +82,7 @@ namespace FinanceManagmentApp.Services
 
         public async Task UpdateAsync(ClaimsPrincipal user, FinancialOperationForUpdateDTO finOp, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(user);
             ArgumentNullException.ThrowIfNull(finOp);
 
             var userId = _jwtUtility.GetUserIdFromJwt(user);

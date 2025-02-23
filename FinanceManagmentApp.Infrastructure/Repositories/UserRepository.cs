@@ -12,7 +12,7 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
 
         public override async Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return (await _dbSet.Include(e => e.Roles).Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;
+            return (await _dbSet.Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;
         }
 
         public async Task<User> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)

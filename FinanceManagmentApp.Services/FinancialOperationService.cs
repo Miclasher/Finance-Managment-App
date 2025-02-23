@@ -31,6 +31,11 @@ namespace FinanceManagmentApp.Services
                 throw new InvalidOperationException("No transaction types available for the user. Cannot create financial operation.");
             }
 
+            if (finOp.Amount <= 0)
+            {
+                throw new ArgumentException("Amount must be greater than zero.");
+            }
+
             var newFinOp = finOp.Adapt<FinancialOperation>();
 
             newFinOp.UserId = userId;
@@ -99,6 +104,11 @@ namespace FinanceManagmentApp.Services
             if (finOpToUpdate.UserId != userId)
             {
                 throw new AccessViolationException("Financial operation is owned by another user. Access denied.");
+            }
+
+            if (finOp.Amount <= 0)
+            {
+                throw new ArgumentException("Amount must be greater than zero.");
             }
 
             finOpToUpdate.Date = finOp.Date;

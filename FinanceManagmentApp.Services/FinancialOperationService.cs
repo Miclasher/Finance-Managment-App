@@ -80,7 +80,7 @@ namespace FinanceManagmentApp.Services
             return finOp.Adapt<FinancialOperationDTO>();
         }
 
-        public async Task UpdateAsync(ClaimsPrincipal user, FinancialOperationForUpdateDTO finOp, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(ClaimsPrincipal user, FinancialOperationForUpdateAndSummaryDTO finOp, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(user);
             ArgumentNullException.ThrowIfNull(finOp);

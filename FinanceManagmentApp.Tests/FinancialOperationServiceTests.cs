@@ -126,7 +126,7 @@ namespace FinanceManagmentApp.Tests
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
             _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
 
-            var updateDto = new FinancialOperationForUpdateDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
+            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
 
             await _financialOperationService.UpdateAsync(_user, updateDto);
 
@@ -145,7 +145,7 @@ namespace FinanceManagmentApp.Tests
         {
             _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
 
-            var updateDto = new FinancialOperationForUpdateDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
+            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
 
             await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
         }
@@ -157,7 +157,7 @@ namespace FinanceManagmentApp.Tests
             _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
             _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
 
-            var updateDto = new FinancialOperationForUpdateDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
+            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
 
             await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
         }

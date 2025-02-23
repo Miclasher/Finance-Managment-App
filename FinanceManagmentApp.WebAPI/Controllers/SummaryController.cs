@@ -17,17 +17,17 @@ namespace FinanceManagmentApp.WebAPI.Controllers
             _summaryService = summaryService;
         }
 
-        [HttpGet("daySummary")]
+        [HttpPost("daySummary")]
         public async Task<ActionResult<SummaryDTO>> GetDaySummary([FromBody] DateOnly date)
         {
             var summary = await _summaryService.GetDaySummaryAsync(User, date);
             return Ok(summary);
         }
 
-        [HttpGet("dateRangeSummary")]
-        public async Task<ActionResult<SummaryDTO>> GetDateRangeSummary([FromBody] DateOnly from, DateOnly to)
+        [HttpPost("dateRangeSummary")]
+        public async Task<ActionResult<SummaryDTO>> GetDateRangeSummary([FromBody] DateRangeDTO dateRange)
         {
-            var summary = await _summaryService.GetDateRangeSummaryAsync(User, from, to);
+            var summary = await _summaryService.GetDateRangeSummaryAsync(User, dateRange);
             return Ok(summary);
         }
     }

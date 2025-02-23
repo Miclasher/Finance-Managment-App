@@ -42,7 +42,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] FinancialOperationForUpdateDTO financialOperation)
+        public async Task<IActionResult> Update([FromBody] FinancialOperationForUpdateAndSummaryDTO financialOperation)
         {
             await _financialOperationService.UpdateAsync(User, financialOperation);
 

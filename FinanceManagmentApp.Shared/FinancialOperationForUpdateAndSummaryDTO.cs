@@ -2,7 +2,7 @@
 
 namespace FinanceManagmentApp.Shared
 {
-    public sealed class FinancialOperationForUpdateDTO
+    public sealed class FinancialOperationForUpdateAndSummaryDTO
     {
         [Required]
         public Guid Id { get; set; }

@@ -17,9 +17,11 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
 
         public async Task<IEnumerable<FinancialOperation>> GetAllByUserAndDateRangeAsync(Guid userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.Where(e => e.UserId == userId
-            && DateOnly.FromDateTime(e.Date) >= from
-            && DateOnly.FromDateTime(e.Date) <= to).ToListAsync(cancellationToken);
+            return await _dbSet
+                .Include(e => e.TransactionType)
+                .Where(e => e.UserId == userId
+                && DateOnly.FromDateTime(e.Date) >= from
+                && DateOnly.FromDateTime(e.Date) <= to).ToListAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<FinancialOperation>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)

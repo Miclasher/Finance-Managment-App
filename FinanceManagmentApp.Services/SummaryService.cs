@@ -18,15 +18,19 @@ namespace FinanceManagmentApp.Services
             _repositoryManager = repositoryManager;
         }
 
-        public async Task<SummaryDTO> GetDateRangeSummaryAsync(ClaimsPrincipal user, DateOnly startDate, DateOnly endDate, CancellationToken cancellationToken = default)
+        public async Task<SummaryDTO> GetDateRangeSummaryAsync(ClaimsPrincipal user, DateRangeDTO dateRange, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(user);
-            ArgumentNullException.ThrowIfNull(startDate);
-            ArgumentNullException.ThrowIfNull(endDate);
+            ArgumentNullException.ThrowIfNull(dateRange);
+
+            if (dateRange.StartDate > dateRange.EndDate)
+            {
+                throw new InvalidDataException("Start date cannot be greater than end date.");
+            }
 
             var userId = _jwtUtility.GetUserIdFromJwt(user);
 
-            var financialOperations = await _repositoryManager.FinancialOperation.GetAllByUserAndDateRangeAsync(userId, startDate, endDate, cancellationToken);
+            var financialOperations = await _repositoryManager.FinancialOperation.GetAllByUserAndDateRangeAsync(userId, dateRange.StartDate, dateRange.EndDate, cancellationToken);
 
             return GenerateSummary(financialOperations);
         }
@@ -64,7 +68,7 @@ namespace FinanceManagmentApp.Services
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
-                Operations = financialOperations.Adapt<IEnumerable<FinancialOperationDTO>>()
+                Operations = financialOperations.Adapt<IEnumerable<FinancialOperationForUpdateAndSummaryDTO>>()
             };
         }
     }

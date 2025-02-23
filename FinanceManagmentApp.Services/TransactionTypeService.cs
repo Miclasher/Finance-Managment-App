@@ -39,7 +39,7 @@ namespace FinanceManagmentApp.Services
             var target = await _repositoryManager.TransactionType.GetByIdAsync(targetId, cancellationToken)
                 ?? throw new KeyNotFoundException($"Transaction type with id {targetId} was not found in database.");
 
-            if(target.UserId != _jwtUtility.GetUserIdFromJwt(user))
+            if (target.UserId != _jwtUtility.GetUserIdFromJwt(user))
             {
                 throw new AccessViolationException("Transaction type is owned by another user. Access denied.");
             }

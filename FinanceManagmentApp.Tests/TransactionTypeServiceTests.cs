@@ -1,9 +1,9 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.Services;
+using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
 using Moq;
 using System.Security.Claims;
-using FinanceManagmentApp.Services.Abstractions;
 
 namespace FinanceManagmentApp.Tests
 {

@@ -23,7 +23,7 @@ namespace FinanceManagmentApp.Services
 
             var userToLogin = await _repositoryManager.User.GetByUsernameAsync(user.Username, cancellationToken);
 
-            if(userToLogin is null)
+            if (userToLogin is null)
             {
                 throw new InvalidDataException("Username not found");
             }

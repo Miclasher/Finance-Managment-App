@@ -36,7 +36,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _transactionTypeService.DeleteAsync(User,id);
+            await _transactionTypeService.DeleteAsync(User, id);
 
             return Ok();
         }
@@ -44,7 +44,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpPut]
         public async Task<ActionResult> Update(TransactionTypeForUpdateDTO transactionType)
         {
-            await _transactionTypeService.UpdateAsync(User,transactionType);
+            await _transactionTypeService.UpdateAsync(User, transactionType);
 
             return Ok();
         }
@@ -52,7 +52,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(TransactionTypeForCreateDTO transactionType)
         {
-            await _transactionTypeService.CreateAsync(User,transactionType);
+            await _transactionTypeService.CreateAsync(User, transactionType);
 
             return Ok();
         }

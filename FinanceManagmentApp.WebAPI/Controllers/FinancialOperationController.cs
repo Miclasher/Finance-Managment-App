@@ -1,8 +1,6 @@
-﻿using FinanceManagmentApp.Domain.Repositories;
-using FinanceManagmentApp.Services.Abstractions;
+﻿using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManagmentApp.WebAPI.Controllers
@@ -36,7 +34,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]  FinancialOperationForCreateDTO financialOperation)
+        public async Task<IActionResult> Create([FromBody] FinancialOperationForCreateDTO financialOperation)
         {
             await _financialOperationService.CreateAsync(User, financialOperation);
 

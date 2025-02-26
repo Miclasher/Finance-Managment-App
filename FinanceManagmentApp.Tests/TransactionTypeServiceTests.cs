@@ -1,9 +1,8 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.Services;
-using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
+using Mapster;
 using Moq;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.Tests
 {
@@ -11,128 +10,96 @@ namespace FinanceManagmentApp.Tests
     public class TransactionTypeServiceTests : ServiceTestsBase
     {
         private TransactionTypeService _transactionTypeService = null!;
-        private Mock<IJwtUtility> _mockJwtUtility = null!;
-        private ClaimsPrincipal _user = null!;
-        private Guid _userId;
 
         [TestInitialize]
         public void Initialize()
         {
-            _mockJwtUtility = new Mock<IJwtUtility>();
-            _transactionTypeService = new TransactionTypeService(_mockRepositoryManager.Object, _mockJwtUtility.Object);
-            _userId = Guid.NewGuid();
-            _user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            _transactionTypeService = new TransactionTypeService(_mockRepositoryManager.Object);
+        }
+
+        [TestMethod]
+        public async Task CreateAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var transTypeForCreate = new TransactionTypeForCreateDTO { Name = "Test Type", IsExpense = true };
+            var transType = transTypeForCreate.Adapt<TransactionType>();
+            transType.UserId = userId;
+
+            _mockRepositoryManager.Setup(r => r.TransactionType.AddAsync(It.IsAny<TransactionType>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+            await _transactionTypeService.CreateAsync(userId, transTypeForCreate);
+
+            _mockRepositoryManager.Verify(r => r.TransactionType.AddAsync(It.Is<TransactionType>(t => t.Name == transTypeForCreate.Name && t.IsExpense == transTypeForCreate.IsExpense && t.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DeleteAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var transTypeId = Guid.NewGuid();
+            var transType = new TransactionType { Id = transTypeId, UserId = userId, FinancialOperations = new List<FinancialOperation>() };
+
+            _mockRepositoryManager.Setup(r => r.TransactionType.GetByIdAsync(transTypeId, It.IsAny<CancellationToken>())).ReturnsAsync(transType);
+            _mockRepositoryManager.Setup(r => r.TransactionType.Remove(transType, It.IsAny<CancellationToken>()));
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+            await _transactionTypeService.DeleteAsync(userId, transTypeId);
+
+            _mockRepositoryManager.Verify(r => r.TransactionType.Remove(It.Is<TransactionType>(t => t.Id == transTypeId), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task GetAllAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var transTypes = new List<TransactionType>
             {
-                new Claim(ClaimTypes.NameIdentifier, _userId.ToString())
-            }));
+                new TransactionType { Id = Guid.NewGuid(), UserId = userId, Name = "Type 1", IsExpense = false },
+                new TransactionType { Id = Guid.NewGuid(), UserId = userId, Name = "Type 2", IsExpense = true }
+            };
 
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(_userId);
+            _mockRepositoryManager.Setup(r => r.TransactionType.GetAllByUserAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(transTypes);
+
+            var result = await _transactionTypeService.GetAllAsync(userId);
+
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(t => t.Name == "Type 1"));
+            Assert.IsTrue(result.Any(t => t.Name == "Type 2"));
         }
 
         [TestMethod]
-        public async Task CreateAsyncTest1()
+        public async Task GetByIdAsyncTest()
         {
-            var transType = new TransactionTypeForCreateDTO { Name = "Test", IsExpense = true };
+            var userId = Guid.NewGuid();
+            var transTypeId = Guid.NewGuid();
+            var transType = new TransactionType { Id = transTypeId, UserId = userId, Name = "Test Type", IsExpense = true };
 
-            await _transactionTypeService.CreateAsync(_user, transType);
+            _mockRepositoryManager.Setup(r => r.TransactionType.GetByIdAsync(transTypeId, It.IsAny<CancellationToken>())).ReturnsAsync(transType);
 
-            _mockTransactionTypeRepository.Verify(r => r.AddAsync(It.IsAny<TransactionType>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            var result = await _transactionTypeService.GetByIdAsync(userId, transTypeId);
+
+            Assert.AreEqual(transTypeId, result.Id);
+            Assert.AreEqual("Test Type", result.Name);
         }
 
         [TestMethod]
-        public async Task CreateAsyncTest2()
+        public async Task UpdateAsyncTest()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _transactionTypeService.CreateAsync(null!, new TransactionTypeForCreateDTO()));
-        }
+            var userId = Guid.NewGuid();
+            var transTypeForUpdate = new TransactionTypeForUpdateDTO { Id = Guid.NewGuid(), Name = "Updated Type", IsExpense = false };
+            var transType = new TransactionType { Id = transTypeForUpdate.Id, UserId = userId, Name = "Old Type", IsExpense = true };
 
-        [TestMethod]
-        public async Task DeleteAsyncTest1()
-        {
-            var transType = new TransactionType { Id = Guid.NewGuid(), UserId = _userId, FinancialOperations = new List<FinancialOperation>() };
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(transType);
+            _mockRepositoryManager.Setup(r => r.TransactionType.GetByIdAsync(transTypeForUpdate.Id, It.IsAny<CancellationToken>())).ReturnsAsync(transType);
+            _mockRepositoryManager.Setup(r => r.TransactionType.Update(transType, It.IsAny<CancellationToken>()));
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-            await _transactionTypeService.DeleteAsync(_user, transType.Id);
+            await _transactionTypeService.UpdateAsync(userId, transTypeForUpdate);
 
-            _mockTransactionTypeRepository.Verify(r => r.Remove(It.IsAny<TransactionType>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [TestMethod]
-        public async Task DeleteAsyncTest2()
-        {
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((TransactionType)null!);
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(() => _transactionTypeService.DeleteAsync(_user, Guid.NewGuid()));
-        }
-
-        [TestMethod]
-        public async Task DeleteAsyncTest3()
-        {
-            var transType = new TransactionType { Id = Guid.NewGuid(), UserId = _userId, FinancialOperations = new List<FinancialOperation> { new FinancialOperation() } };
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(transType);
-
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _transactionTypeService.DeleteAsync(_user, transType.Id));
-        }
-
-        [TestMethod]
-        public async Task GetAllAsyncTest1()
-        {
-            var transTypes = new List<TransactionType> { new TransactionType { Id = Guid.NewGuid(), Name = "Test", IsExpense = true, UserId = _userId } };
-            _mockTransactionTypeRepository.Setup(r => r.GetAllByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(transTypes);
-
-            var result = await _transactionTypeService.GetAllAsync(_user);
-
-            Assert.AreEqual(1, result.Count());
-        }
-
-        [TestMethod]
-        public async Task GetByIdAsyncTest1()
-        {
-            var transType = new TransactionType { Id = Guid.NewGuid(), Name = "Test", IsExpense = true, UserId = _userId };
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(transType);
-
-            var result = await _transactionTypeService.GetByIdAsync(_user, transType.Id);
-
-            Assert.AreEqual(transType.Id, result.Id);
-        }
-
-        [TestMethod]
-        public async Task GetByIdAsyncTest2()
-        {
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((TransactionType)null!);
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(() => _transactionTypeService.GetByIdAsync(_user, Guid.NewGuid()));
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest1()
-        {
-            var transType = new TransactionType { Id = Guid.NewGuid(), Name = "Test", IsExpense = true, UserId = _userId };
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(transType);
-
-            var updateDto = new TransactionTypeForUpdateDTO { Id = transType.Id, Name = "Updated", IsExpense = false };
-
-            await _transactionTypeService.UpdateAsync(_user, updateDto);
-
-            _mockTransactionTypeRepository.Verify(r => r.Update(It.IsAny<TransactionType>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest2()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _transactionTypeService.UpdateAsync(_user, null!));
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest3()
-        {
-            _mockTransactionTypeRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((TransactionType)null!);
-
-            var updateDto = new TransactionTypeForUpdateDTO { Id = Guid.NewGuid(), Name = "Updated", IsExpense = false };
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(() => _transactionTypeService.UpdateAsync(_user, updateDto));
+            _mockRepositoryManager.Verify(r => r.TransactionType.Update(It.Is<TransactionType>(t => t.Name == transTypeForUpdate.Name && t.IsExpense == transTypeForUpdate.IsExpense), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

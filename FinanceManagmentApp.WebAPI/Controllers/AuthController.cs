@@ -1,8 +1,6 @@
 ﻿using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.WebAPI.Controllers
 {
@@ -15,13 +13,6 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         public AuthController(IAuthService authService)
         {
             _authService = authService;
-        }
-
-        [Authorize]
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok($"You are authorized as user with id {User.FindFirstValue(ClaimTypes.NameIdentifier)}");
         }
 
         [HttpPost("login")]

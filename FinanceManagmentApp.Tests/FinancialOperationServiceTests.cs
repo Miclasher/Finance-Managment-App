@@ -1,9 +1,8 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.Services;
-using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
+using Mapster;
 using Moq;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.Tests
 {
@@ -11,156 +10,97 @@ namespace FinanceManagmentApp.Tests
     public class FinancialOperationServiceTests : ServiceTestsBase
     {
         private FinancialOperationService _financialOperationService = null!;
-        private Mock<IJwtUtility> _mockJwtUtility = null!;
-        private ClaimsPrincipal _user = null!;
 
         [TestInitialize]
         public void Initialize()
         {
-            _mockJwtUtility = new Mock<IJwtUtility>();
-            _financialOperationService = new FinancialOperationService(_mockRepositoryManager.Object, _mockJwtUtility.Object);
-            _user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            _financialOperationService = new FinancialOperationService(_mockRepositoryManager.Object);
+        }
+
+        [TestMethod]
+        public async Task CreateAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var finOpForCreate = new FinancialOperationForCreateDTO { Amount = 100, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid(), UserComment = "Test Comment" };
+            var finOp = finOpForCreate.Adapt<FinancialOperation>();
+            finOp.UserId = userId;
+
+            _mockRepositoryManager.Setup(r => r.TransactionType.GetAllByUserAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(new List<TransactionType> { new TransactionType { Id = finOp.TransactionTypeId, UserId = userId } });
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.AddAsync(It.IsAny<FinancialOperation>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+            await _financialOperationService.CreateAsync(userId, finOpForCreate);
+
+            _mockRepositoryManager.Verify(r => r.FinancialOperation.AddAsync(It.Is<FinancialOperation>(f => f.Amount == finOpForCreate.Amount && f.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DeleteAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var finOpId = Guid.NewGuid();
+            var finOp = new FinancialOperation { Id = finOpId, UserId = userId };
+
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.GetByIdAsync(finOpId, It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.Remove(finOp, It.IsAny<CancellationToken>()));
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+            await _financialOperationService.DeleteAsync(userId, finOpId);
+
+            _mockRepositoryManager.Verify(r => r.FinancialOperation.Remove(It.Is<FinancialOperation>(f => f.Id == finOpId), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task GetAllAsyncTest()
+        {
+            var userId = Guid.NewGuid();
+            var finOps = new List<FinancialOperation>
             {
-                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
-            }));
+                new FinancialOperation { Id = Guid.NewGuid(), UserId = userId, Amount = 100, Date = DateTime.UtcNow },
+                new FinancialOperation { Id = Guid.NewGuid(), UserId = userId, Amount = 200, Date = DateTime.UtcNow }
+            };
+
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.GetAllByUserAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
+
+            var result = await _financialOperationService.GetAllAsync(userId);
+
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(f => f.Amount == 100));
+            Assert.IsTrue(result.Any(f => f.Amount == 200));
         }
 
         [TestMethod]
-        public async Task CreateAsyncTest1()
-        {
-            var finOp = new FinancialOperationForCreateDTO { Amount = 100, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
-            _mockTransactionTypeRepository.Setup(r => r.GetAllByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<TransactionType> { new TransactionType { Id = finOp.TransactionTypeId } });
-
-            await _financialOperationService.CreateAsync(_user, finOp);
-
-            _mockFinancialOperationRepository.Verify(r => r.AddAsync(It.IsAny<FinancialOperation>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [TestMethod]
-        public async Task CreateAsyncTest2()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _financialOperationService.CreateAsync(_user, null!));
-        }
-
-        [TestMethod]
-        public async Task DeleteAsyncTest1()
-        {
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(finOp.UserId);
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
-
-            await _financialOperationService.DeleteAsync(_user, finOp.Id);
-
-            _mockFinancialOperationRepository.Verify(r => r.Remove(It.IsAny<FinancialOperation>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [TestMethod]
-        public async Task DeleteAsyncTest2()
-        {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.DeleteAsync(_user, Guid.NewGuid()));
-        }
-
-        [TestMethod]
-        public async Task DeleteAsyncTest3()
-        {
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
-
-            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.DeleteAsync(_user, finOp.Id));
-        }
-
-        [TestMethod]
-        public async Task GetAllAsyncTest1()
+        public async Task GetByIdAsyncTest()
         {
             var userId = Guid.NewGuid();
-            var finOps = new List<FinancialOperation> { new FinancialOperation { Id = Guid.NewGuid(), UserId = userId } };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
-            _mockFinancialOperationRepository.Setup(r => r.GetAllByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
+            var finOpId = Guid.NewGuid();
+            var finOp = new FinancialOperation { Id = finOpId, UserId = userId, Amount = 100, Date = DateTime.UtcNow };
 
-            var result = await _financialOperationService.GetAllAsync(_user);
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.GetByIdAsync(finOpId, It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
 
-            Assert.AreEqual(1, result.Count());
+            var result = await _financialOperationService.GetByIdAsync(userId, finOpId);
+
+            Assert.AreEqual(finOpId, result.Id);
+            Assert.AreEqual(100, result.Amount);
         }
 
         [TestMethod]
-        public async Task GetByIdAsyncTest1()
+        public async Task UpdateAsyncTest()
         {
             var userId = Guid.NewGuid();
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = userId };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
+            var finOpForUpdate = new FinancialOperationForUpdateAndSummaryDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid(), UserComment = "Updated Comment" };
+            var finOp = new FinancialOperation { Id = finOpForUpdate.Id, UserId = userId, Amount = 100, Date = DateTime.UtcNow, TransactionTypeId = finOpForUpdate.TransactionTypeId };
 
-            var result = await _financialOperationService.GetByIdAsync(_user, finOp.Id);
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.GetByIdAsync(finOpForUpdate.Id, It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
+            _mockRepositoryManager.Setup(r => r.FinancialOperation.Update(finOp, It.IsAny<CancellationToken>()));
+            _mockRepositoryManager.Setup(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-            Assert.AreEqual(finOp.Id, result.Id);
-        }
+            await _financialOperationService.UpdateAsync(userId, finOpForUpdate);
 
-        [TestMethod]
-        public async Task GetByIdAsyncTest2()
-        {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.GetByIdAsync(_user, Guid.NewGuid()));
-        }
-
-        [TestMethod]
-        public async Task GetByIdAsyncTest3()
-        {
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
-
-            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.GetByIdAsync(_user, finOp.Id));
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest1()
-        {
-            var userId = Guid.NewGuid();
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = userId };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
-
-            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
-
-            await _financialOperationService.UpdateAsync(_user, updateDto);
-
-            _mockFinancialOperationRepository.Verify(r => r.Update(It.IsAny<FinancialOperation>(), It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest2()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _financialOperationService.UpdateAsync(_user, null!));
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest3()
-        {
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))!.ReturnsAsync((FinancialOperation)null!);
-
-            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
-
-            await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
-        }
-
-        [TestMethod]
-        public async Task UpdateAsyncTest4()
-        {
-            var finOp = new FinancialOperation { Id = Guid.NewGuid(), UserId = Guid.NewGuid() };
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(Guid.NewGuid());
-            _mockFinancialOperationRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(finOp);
-
-            var updateDto = new FinancialOperationForUpdateAndSummaryDTO { Id = finOp.Id, Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid() };
-
-            await Assert.ThrowsExceptionAsync<AccessViolationException>(async () => await _financialOperationService.UpdateAsync(_user, updateDto));
+            _mockRepositoryManager.Verify(r => r.FinancialOperation.Update(It.Is<FinancialOperation>(f => f.Amount == finOpForUpdate.Amount && f.UserComment == finOpForUpdate.UserComment), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRepositoryManager.Verify(r => r.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
+using FinanceManagmentApp.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,9 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionTypeDTO>>> GetAll()
         {
-            var trTypes = await _transactionTypeService.GetAllAsync(User);
+            var userId = User.GetUserIdFromJwt();
+
+            var trTypes = await _transactionTypeService.GetAllAsync(userId);
 
             return Ok(trTypes);
         }
@@ -28,7 +31,9 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionTypeDTO>> GetById(Guid id)
         {
-            var trType = await _transactionTypeService.GetByIdAsync(User, id);
+            var userId = User.GetUserIdFromJwt();
+
+            var trType = await _transactionTypeService.GetByIdAsync(userId, id);
 
             return Ok(trType);
         }
@@ -36,7 +41,9 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _transactionTypeService.DeleteAsync(User, id);
+            var userId = User.GetUserIdFromJwt();
+
+            await _transactionTypeService.DeleteAsync(userId, id);
 
             return Ok();
         }
@@ -44,7 +51,9 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpPut]
         public async Task<ActionResult> Update(TransactionTypeForUpdateDTO transactionType)
         {
-            await _transactionTypeService.UpdateAsync(User, transactionType);
+            var userId = User.GetUserIdFromJwt();
+
+            await _transactionTypeService.UpdateAsync(userId, transactionType);
 
             return Ok();
         }
@@ -52,7 +61,9 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(TransactionTypeForCreateDTO transactionType)
         {
-            await _transactionTypeService.CreateAsync(User, transactionType);
+            var userId = User.GetUserIdFromJwt();
+
+            await _transactionTypeService.CreateAsync(userId, transactionType);
 
             return Ok();
         }

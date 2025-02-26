@@ -1,9 +1,7 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.Services;
-using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
 using Moq;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.Tests
 {
@@ -11,18 +9,11 @@ namespace FinanceManagmentApp.Tests
     public class SummaryServiceTests : ServiceTestsBase
     {
         private SummaryService _summaryService = null!;
-        private Mock<IJwtUtility> _mockJwtUtility = null!;
-        private ClaimsPrincipal _user = null!;
 
         [TestInitialize]
         public void Initialize()
         {
-            _mockJwtUtility = new Mock<IJwtUtility>();
-            _summaryService = new SummaryService(_mockJwtUtility.Object, _mockRepositoryManager.Object);
-            _user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
-            }));
+            _summaryService = new SummaryService(_mockRepositoryManager.Object);
         }
 
         [TestMethod]
@@ -36,10 +27,9 @@ namespace FinanceManagmentApp.Tests
                 new FinancialOperation { Id = Guid.NewGuid(), UserId = userId, Amount = 50, Date = DateTime.UtcNow, TransactionType = new TransactionType { IsExpense = true } }
             };
 
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
             _mockFinancialOperationRepository.Setup(r => r.GetAllByUserAndDateRangeAsync(userId, dateRange.StartDate, dateRange.EndDate, It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
 
-            var result = await _summaryService.GetDateRangeSummaryAsync(_user, dateRange);
+            var result = await _summaryService.GetDateRangeSummaryAsync(userId, dateRange);
 
             Assert.AreEqual(100, result.TotalIncome);
             Assert.AreEqual(50, result.TotalExpense);
@@ -49,13 +39,8 @@ namespace FinanceManagmentApp.Tests
         [TestMethod]
         public async Task GetDateRangeSummaryAsyncTest2()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _summaryService.GetDateRangeSummaryAsync(null!, new DateRangeDTO()));
-        }
-
-        [TestMethod]
-        public async Task GetDateRangeSummaryAsyncTest3()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _summaryService.GetDateRangeSummaryAsync(_user, null!));
+            var userId = Guid.NewGuid();
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _summaryService.GetDateRangeSummaryAsync(userId, null!));
         }
 
         [TestMethod]
@@ -69,20 +54,13 @@ namespace FinanceManagmentApp.Tests
                 new FinancialOperation { Id = Guid.NewGuid(), UserId = userId, Amount = 50, Date = DateTime.UtcNow, TransactionType = new TransactionType { IsExpense = true } }
             };
 
-            _mockJwtUtility.Setup(j => j.GetUserIdFromJwt(It.IsAny<ClaimsPrincipal>())).Returns(userId);
             _mockFinancialOperationRepository.Setup(r => r.GetAllByUserAndDateRangeAsync(userId, date, date, It.IsAny<CancellationToken>())).ReturnsAsync(finOps);
 
-            var result = await _summaryService.GetDaySummaryAsync(_user, date);
+            var result = await _summaryService.GetDaySummaryAsync(userId, date);
 
             Assert.AreEqual(100, result.TotalIncome);
             Assert.AreEqual(50, result.TotalExpense);
             Assert.AreEqual(2, result.Operations.Count());
-        }
-
-        [TestMethod]
-        public async Task GetDaySummaryAsyncTest2()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await _summaryService.GetDaySummaryAsync(null!, DateOnly.FromDateTime(DateTime.UtcNow)));
         }
     }
 }

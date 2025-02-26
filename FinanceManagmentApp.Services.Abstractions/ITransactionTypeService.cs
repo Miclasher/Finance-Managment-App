@@ -1,14 +1,13 @@
 ﻿using FinanceManagmentApp.Shared;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.Services.Abstractions
 {
     public interface ITransactionTypeService
     {
-        Task<TransactionTypeDTO> GetByIdAsync(ClaimsPrincipal user, Guid id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TransactionTypeDTO>> GetAllAsync(ClaimsPrincipal user, CancellationToken cancellationToken = default);
-        Task DeleteAsync(ClaimsPrincipal user, Guid targetId, CancellationToken cancellationToken = default);
-        Task UpdateAsync(ClaimsPrincipal user, TransactionTypeForUpdateDTO transType, CancellationToken cancellationToken = default);
-        Task CreateAsync(ClaimsPrincipal user, TransactionTypeForCreateDTO transType, CancellationToken cancellationToken = default);
+        Task<TransactionTypeDTO> GetByIdAsync(Guid userId, Guid id, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TransactionTypeDTO>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid userId, Guid targetId, CancellationToken cancellationToken = default);
+        Task UpdateAsync(Guid userId, TransactionTypeForUpdateDTO transType, CancellationToken cancellationToken = default);
+        Task CreateAsync(Guid userId, TransactionTypeForCreateDTO transType, CancellationToken cancellationToken = default);
     }
 }

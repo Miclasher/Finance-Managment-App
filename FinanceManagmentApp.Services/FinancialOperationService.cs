@@ -3,27 +3,21 @@ using FinanceManagmentApp.Domain.Repositories;
 using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
 using Mapster;
-using System.Security.Claims;
 
 namespace FinanceManagmentApp.Services
 {
     public sealed class FinancialOperationService : IFinancialOperationService
     {
         private readonly IRepositoryManager _repositoryManager;
-        private readonly IJwtUtility _jwtUtility;
 
-        public FinancialOperationService(IRepositoryManager repositoryManager, IJwtUtility jwtUtility)
+        public FinancialOperationService(IRepositoryManager repositoryManager)
         {
-            _jwtUtility = jwtUtility ?? throw new ArgumentNullException(nameof(jwtUtility));
             _repositoryManager = repositoryManager ?? throw new ArgumentNullException(nameof(repositoryManager));
         }
 
-        public async Task CreateAsync(ClaimsPrincipal user, FinancialOperationForCreateDTO finOp, CancellationToken cancellationToken = default)
+        public async Task CreateAsync(Guid userId, FinancialOperationForCreateDTO finOp, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(finOp);
-            ArgumentNullException.ThrowIfNull(user);
-
-            var userId = _jwtUtility.GetUserIdFromJwt(user);
 
             var transactionTypes = await _repositoryManager.TransactionType.GetAllByUserAsync(userId, cancellationToken);
             if (!transactionTypes.Any())
@@ -45,11 +39,8 @@ namespace FinanceManagmentApp.Services
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(ClaimsPrincipal user, Guid targetId, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Guid userId, Guid targetId, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(user);
-            var userId = _jwtUtility.GetUserIdFromJwt(user);
-
             var target = await _repositoryManager.FinancialOperation.GetByIdAsync(targetId, cancellationToken)
                 ?? throw new KeyNotFoundException($"Financial operation with id {targetId} was not found in database.");
 
@@ -63,23 +54,15 @@ namespace FinanceManagmentApp.Services
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<FinancialOperationDTO>> GetAllAsync(ClaimsPrincipal user, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<FinancialOperationDTO>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(user);
-
-            var userId = _jwtUtility.GetUserIdFromJwt(user);
-
             var finOps = await _repositoryManager.FinancialOperation.GetAllByUserAsync(userId, cancellationToken);
 
             return finOps.Adapt<IEnumerable<FinancialOperationDTO>>();
         }
 
-        public async Task<FinancialOperationDTO> GetByIdAsync(ClaimsPrincipal user, Guid id, CancellationToken cancellationToken = default)
+        public async Task<FinancialOperationDTO> GetByIdAsync(Guid userId, Guid id, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(user);
-
-            var userId = _jwtUtility.GetUserIdFromJwt(user);
-
             var finOp = await _repositoryManager.FinancialOperation.GetByIdAsync(id, cancellationToken)
                 ?? throw new KeyNotFoundException($"Financial operation with id {id} was not found in database.");
 
@@ -91,12 +74,9 @@ namespace FinanceManagmentApp.Services
             return finOp.Adapt<FinancialOperationDTO>();
         }
 
-        public async Task UpdateAsync(ClaimsPrincipal user, FinancialOperationForUpdateAndSummaryDTO finOp, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(Guid userId, FinancialOperationForUpdateAndSummaryDTO finOp, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(user);
             ArgumentNullException.ThrowIfNull(finOp);
-
-            var userId = _jwtUtility.GetUserIdFromJwt(user);
 
             var finOpToUpdate = await _repositoryManager.FinancialOperation.GetByIdAsync(finOp.Id, cancellationToken)
                 ?? throw new KeyNotFoundException($"Financial operation with id {finOp.Id} was not found in database.");

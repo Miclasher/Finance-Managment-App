@@ -1,5 +1,6 @@
 ﻿using FinanceManagmentApp.Services.Abstractions;
 using FinanceManagmentApp.Shared;
+using FinanceManagmentApp.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,14 +21,18 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         [HttpPost("daySummary")]
         public async Task<ActionResult<SummaryDTO>> GetDaySummary([FromBody] DateOnly date)
         {
-            var summary = await _summaryService.GetDaySummaryAsync(User, date);
+            var userId = User.GetUserIdFromJwt();
+
+            var summary = await _summaryService.GetDaySummaryAsync(userId, date);
             return Ok(summary);
         }
 
         [HttpPost("dateRangeSummary")]
         public async Task<ActionResult<SummaryDTO>> GetDateRangeSummary([FromBody] DateRangeDTO dateRange)
         {
-            var summary = await _summaryService.GetDateRangeSummaryAsync(User, dateRange);
+            var userId = User.GetUserIdFromJwt();
+
+            var summary = await _summaryService.GetDateRangeSummaryAsync(userId, dateRange);
             return Ok(summary);
         }
     }

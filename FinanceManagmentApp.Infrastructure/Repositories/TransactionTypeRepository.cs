@@ -12,7 +12,7 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
 
         public async Task<IEnumerable<TransactionType>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.Where(e => e.UserId == userId).ToListAsync(cancellationToken);
+            return await _dbSet.AsNoTracking().Where(e => e.UserId == userId).ToListAsync(cancellationToken);
         }
     }
 }

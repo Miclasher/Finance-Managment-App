@@ -28,12 +28,12 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
-            return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
+            return await _dbSet.AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbSet.ToListAsync(cancellationToken);
+            return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
         }
 
         public virtual async Task<TEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

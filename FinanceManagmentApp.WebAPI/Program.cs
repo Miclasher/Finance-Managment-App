@@ -29,7 +29,6 @@ namespace FinanceManagmentApp.WebAPI
             builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 
             builder.Services.AddScoped<IJwtUtility, JwtUtility>();
-            builder.Services.Configure<JwtUtility>(builder.Configuration.GetSection("Jwt"));
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();

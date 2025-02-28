@@ -90,7 +90,7 @@ namespace FinanceManagmentApp.Tests
         public async Task UpdateAsyncTest()
         {
             var userId = Guid.NewGuid();
-            var finOpForUpdate = new FinancialOperationForUpdateAndSummaryDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid(), UserComment = "Updated Comment" };
+            var finOpForUpdate = new FinancialOperationDTO { Id = Guid.NewGuid(), Amount = 200, Date = DateTime.UtcNow, TransactionTypeId = Guid.NewGuid(), UserComment = "Updated Comment" };
             var finOp = new FinancialOperation { Id = finOpForUpdate.Id, UserId = userId, Amount = 100, Date = DateTime.UtcNow, TransactionTypeId = finOpForUpdate.TransactionTypeId };
 
             _mockRepositoryManager.Setup(r => r.FinancialOperation.GetByIdAsync(finOpForUpdate.Id, It.IsAny<CancellationToken>())).ReturnsAsync(finOp);

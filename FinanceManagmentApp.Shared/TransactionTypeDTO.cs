@@ -11,6 +11,5 @@ namespace FinanceManagmentApp.Shared
         public string Name { get; set; } = string.Empty;
         [Required]
         public bool IsExpense { get; set; }
-        public IEnumerable<FinancialOperationDTO> FinancialOperations { get; set; } = new List<FinancialOperationDTO>();
     }
 }

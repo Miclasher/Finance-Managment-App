@@ -14,6 +14,5 @@ namespace FinanceManagmentApp.Shared
         public string? UserComment { get; set; }
         [Required]
         public Guid TransactionTypeId { get; set; }
-        public TransactionTypeDTO TransactionType { get; set; } = null!;
     }
 }

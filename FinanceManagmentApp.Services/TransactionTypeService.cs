@@ -15,7 +15,7 @@ namespace FinanceManagmentApp.Services
             _repositoryManager = repositoryManager ?? throw new ArgumentNullException(nameof(repositoryManager));
         }
 
-        public async Task CreateAsync(Guid userId, TransactionTypeForCreateDTO transType, CancellationToken cancellationToken = default)
+        public async Task<Guid> CreateAsync(Guid userId, TransactionTypeForCreateDTO transType, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(transType);
 
@@ -26,6 +26,8 @@ namespace FinanceManagmentApp.Services
             await _repositoryManager.TransactionType.AddAsync(newTransType, cancellationToken);
 
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            return newTransType.Id;
         }
 
         public async Task DeleteAsync(Guid userId, Guid targetId, CancellationToken cancellationToken = default)
@@ -67,7 +69,7 @@ namespace FinanceManagmentApp.Services
             return transType.Adapt<TransactionTypeDTO>();
         }
 
-        public async Task UpdateAsync(Guid userId, TransactionTypeForUpdateDTO transType, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(Guid userId, TransactionTypeDTO transType, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(transType);
             var transTypeToUpdate = await _repositoryManager.TransactionType.GetByIdAsync(transType.Id, cancellationToken)

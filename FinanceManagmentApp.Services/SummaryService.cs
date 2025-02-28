@@ -59,7 +59,7 @@ namespace FinanceManagmentApp.Services
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
-                Operations = financialOperations.Adapt<IEnumerable<FinancialOperationForUpdateAndSummaryDTO>>()
+                Operations = financialOperations.Adapt<IEnumerable<FinancialOperationDTO>>()
             };
         }
     }

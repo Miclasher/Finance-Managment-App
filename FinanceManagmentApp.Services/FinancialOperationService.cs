@@ -15,7 +15,7 @@ namespace FinanceManagmentApp.Services
             _repositoryManager = repositoryManager ?? throw new ArgumentNullException(nameof(repositoryManager));
         }
 
-        public async Task CreateAsync(Guid userId, FinancialOperationForCreateDTO finOp, CancellationToken cancellationToken = default)
+        public async Task<Guid> CreateAsync(Guid userId, FinancialOperationForCreateDTO finOp, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(finOp);
 
@@ -37,6 +37,8 @@ namespace FinanceManagmentApp.Services
             await _repositoryManager.FinancialOperation.AddAsync(newFinOp, cancellationToken);
 
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            return newFinOp.Id;
         }
 
         public async Task DeleteAsync(Guid userId, Guid targetId, CancellationToken cancellationToken = default)
@@ -74,7 +76,7 @@ namespace FinanceManagmentApp.Services
             return finOp.Adapt<FinancialOperationDTO>();
         }
 
-        public async Task UpdateAsync(Guid userId, FinancialOperationForUpdateAndSummaryDTO finOp, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(Guid userId, FinancialOperationDTO finOp, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(finOp);
 

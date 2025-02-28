@@ -4,6 +4,6 @@
     {
         public decimal TotalIncome { get; set; }
         public decimal TotalExpense { get; set; }
-        public IEnumerable<FinancialOperationForUpdateAndSummaryDTO> Operations { get; set; } = new List<FinancialOperationForUpdateAndSummaryDTO>();
+        public IEnumerable<FinancialOperationDTO> Operations { get; set; } = new List<FinancialOperationDTO>();
     }
 }

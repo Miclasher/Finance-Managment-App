@@ -39,17 +39,17 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] FinancialOperationForCreateDTO financialOperation)
+        public async Task<ActionResult<Guid>> Create([FromBody] FinancialOperationForCreateDTO financialOperation)
         {
             var userId = User.GetUserIdFromJwt();
 
-            await _financialOperationService.CreateAsync(userId, financialOperation);
+            var newFinOpId = await _financialOperationService.CreateAsync(userId, financialOperation);
 
-            return Ok();
+            return Ok(newFinOpId);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] FinancialOperationForUpdateAndSummaryDTO financialOperation)
+        public async Task<IActionResult> Update([FromBody] FinancialOperationDTO financialOperation)
         {
             var userId = User.GetUserIdFromJwt();
 

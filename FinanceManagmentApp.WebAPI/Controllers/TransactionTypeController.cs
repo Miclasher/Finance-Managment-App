@@ -49,7 +49,7 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(TransactionTypeForUpdateDTO transactionType)
+        public async Task<ActionResult> Update(TransactionTypeDTO transactionType)
         {
             var userId = User.GetUserIdFromJwt();
 
@@ -59,13 +59,13 @@ namespace FinanceManagmentApp.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(TransactionTypeForCreateDTO transactionType)
+        public async Task<ActionResult<Guid>> Create(TransactionTypeForCreateDTO transactionType)
         {
             var userId = User.GetUserIdFromJwt();
 
-            await _transactionTypeService.CreateAsync(userId, transactionType);
+            var newTransTypeid = await _transactionTypeService.CreateAsync(userId, transactionType);
 
-            return Ok();
+            return Ok(newTransTypeid);
         }
     }
 }

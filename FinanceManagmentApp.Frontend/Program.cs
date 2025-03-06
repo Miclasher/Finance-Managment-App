@@ -1,4 +1,5 @@
 using FinanceManagmentApp.Frontend.Components;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FinanceManagmentApp.Frontend
 {
@@ -11,6 +12,20 @@ namespace FinanceManagmentApp.Frontend
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddHttpClient("FinanceManagmentAppAPI", client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+            });
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = builder.Configuration["Jwt:Audience"];
+                    options.Authority = builder.Configuration["ApiBaseUrl"];
+                });
+
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -29,6 +44,9 @@ namespace FinanceManagmentApp.Frontend
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.Run();
         }

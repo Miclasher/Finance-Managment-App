@@ -21,6 +21,7 @@ namespace FinanceManagmentApp.Frontend.Services
             var identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
             _currentUser = new ClaimsPrincipal(identity);
 
+            var state = new AuthenticationState(_currentUser);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
         }
 

@@ -1,0 +1,17 @@
+﻿@page "/logout"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject AuthService AuthService
+<h3>Logout</h3>
+<div class="container">
+    <p>Are you sure you want to log out?</p>
+    <button @onclick="LogUserOut" class="btn btn-danger">Log out</button>
+</div>
+@code {
+    private async Task LogUserOut()
+    {
+        await AuthService.LogoutAsync();
+
+        NavigationManager.NavigateTo("/");
+    }
+}

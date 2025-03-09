@@ -4,37 +4,31 @@
 @inject NavigationManager NavigationManager
 
 <h3>Login</h3>
-@if(!string.IsNullOrEmpty(ErrorMessage))
+@if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <p class="text-danger">@ErrorMessage</p>
 }
 
-<input @bind="UserLoginDTO.Username" class="form-control" placeholder="Username" />
-<input @bind="UserLoginDTO.Password" type="password" class="form-control" placeholder="Password" />
-<button class="btn btn-primary" @onclick="LoginUserAsync">Login</button>
+<div class="container">
+    <input @bind="UserLoginDTO.Username" class="form-control m-3" placeholder="Username" />
+    <input @bind="UserLoginDTO.Password" type="password" class="form-control m-3" placeholder="Password" />
+    <button class="btn btn-primary m-3" @onclick="LoginUserAsync">Login</button>
+</div>
 
 @code {
     string? ErrorMessage { get; set; }
-    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO() { Username = string.Empty, Password = string.Empty};
+    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO() { Username = string.Empty, Password = string.Empty };
 
     private async Task LoginUserAsync()
     {
-        try
+        var success = await AuthService.LoginAsync(UserLoginDTO);
+        if (success)
         {
-            var success = await AuthService.LoginAsync(UserLoginDTO);
-            if (success)
-            {
-                NavigationManager.NavigateTo("/");
-            }
-            else
-            {
-                ErrorMessage = "Failed to login.";
-                StateHasChanged();
-            }
+            NavigationManager.NavigateTo("/");
         }
-        catch (Exception ex)
+        else
         {
-            ErrorMessage = ex.Message;
+            ErrorMessage = "Failed to login.";
             StateHasChanged();
         }
     }

@@ -25,7 +25,9 @@ namespace FinanceManagmentApp.Frontend
                     options.Authority = builder.Configuration["ApiBaseUrl"];
                 });
 
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            builder.Services.AddSingleton<CustomAuthenticationStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+
             builder.Services.AddScoped<AuthService>();
 
             builder.Services.AddAuthorization();

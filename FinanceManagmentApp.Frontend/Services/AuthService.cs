@@ -98,14 +98,14 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task LogoutAsync()
         {
-            await _jsRuntime.InvokeVoidAsync("localStorageHelper.RemoveItem", refreshTokenKey);
-            await _jsRuntime.InvokeVoidAsync("localStorageHelper.RemoveItem", accessTokenKey);
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", refreshTokenKey);
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", accessTokenKey);
             (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogout();
         }
 
         public async Task<string> GetAccessToke()
         {
-            var accessToken = await _jsRuntime.InvokeAsync<string>("localStorageHelper.GetItem", accessTokenKey);
+            var accessToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", accessTokenKey);
 
             if (string.IsNullOrEmpty(accessToken) || IsTokenExpired(accessToken))
             {
@@ -117,8 +117,8 @@ namespace FinanceManagmentApp.Frontend.Services
 
         private async Task SaveTokens(AuthResponseDTO authResponse)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorageHelper.SetItem", accessTokenKey, authResponse.AccessToken);
-            await _jsRuntime.InvokeVoidAsync("localStorageHelper.SetItem", refreshTokenKey, authResponse.RefreshToken);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", accessTokenKey, authResponse.AccessToken);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", refreshTokenKey, authResponse.RefreshToken);
         }
 
         private static bool IsTokenExpired(string token)
@@ -130,7 +130,7 @@ namespace FinanceManagmentApp.Frontend.Services
 
         private async Task<string> GetRefreshToken()
         {
-            return await _jsRuntime.InvokeAsync<string>("localStorageHelper.GetItem", refreshTokenKey);
+            return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", refreshTokenKey);
         }
     }
 }

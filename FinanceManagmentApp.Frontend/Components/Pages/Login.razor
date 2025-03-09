@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
 @inject AuthService AuthService
 @inject NavigationManager NavigationManager
 
@@ -10,7 +11,7 @@
 
 <input @bind="UserLoginDTO.Username" class="form-control" placeholder="Username" />
 <input @bind="UserLoginDTO.Password" type="password" class="form-control" placeholder="Password" />
-<button @onclick="() => Console.WriteLine(1221321321321321)" class="btn btn-primary">Login</button>
+<button class="btn btn-primary" @onclick="LoginUserAsync">Login</button>
 
 @code {
     string? ErrorMessage { get; set; }

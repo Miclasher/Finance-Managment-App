@@ -1,7 +1,6 @@
 ﻿using FinanceManagmentApp.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace FinanceManagmentApp.Frontend.Services

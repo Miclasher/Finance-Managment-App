@@ -1,0 +1,40 @@
+﻿@page "/login"
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+@if(!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+<input @bind="UserLoginDTO.Username" class="form-control" placeholder="Username" />
+<input @bind="UserLoginDTO.Password" type="password" class="form-control" placeholder="Password" />
+<button @onclick="() => Console.WriteLine(1221321321321321)" class="btn btn-primary">Login</button>
+
+@code {
+    string? ErrorMessage { get; set; }
+    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO() { Username = string.Empty, Password = string.Empty};
+
+    private async Task LoginUserAsync()
+    {
+        try
+        {
+            var success = await AuthService.LoginAsync(UserLoginDTO);
+            if (success)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "Failed to login.";
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            StateHasChanged();
+        }
+    }
+}

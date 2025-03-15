@@ -1,0 +1,86 @@
+﻿@page "/financialOperations/edit/{id:Guid}/"
+@rendermode InteractiveServer
+@inject IFinancialOperationService FinancialOperationService
+@inject ITransactionTypeService TransactionTypeService
+@inject NavigationManager NavigationManager
+
+<h3>Edit</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@if (FinancialOperation is null || TransactionTypes is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm model="FinancialOperation" class="container" OnValidSubmit="HandleEdit">
+        <DataAnnotationsValidator />
+        <div class="m-3">
+            <label class="form-label" for="amount">Amount:</label>
+            <InputNumber class="form-control" id="amount" @bind-Value="FinancialOperation.Amount" />
+            <ValidationMessage For="@(() => FinancialOperation.Amount)" />
+        </div>
+        <div class="m-3">
+            <label class="form-label" for="userComment">Comment:</label>
+            <InputText class="form-control" id="userComment" @bind-Value="FinancialOperation.UserComment" />
+            <ValidationMessage For="@(() => FinancialOperation.UserComment)" />
+        </div>
+        <div class="m-3">
+            <label class="form-label" for="transactionTypeId">Transaction type</label>
+            <InputSelect class="form-control" id="transactionTypeId" @bind-Value="FinancialOperation.TransactionTypeId">
+                @foreach (var transactionType in TransactionTypes)
+                {
+                    <option value="@transactionType.Id">@transactionType.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => FinancialOperation.TransactionTypeId)" />
+        </div>
+        <div class="m-3">
+            <label class="form-label" for="date">Date:</label>
+            <InputDate class="form-control" id="date" @bind-Value="FinancialOperation.Date" />
+            <ValidationMessage For="@(() => FinancialOperation.Date)" />
+        </div>
+        <button class="btn btn-primary m-3" type="submit">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private FinancialOperationDTO FinancialOperation { get; set; } = null!;
+    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = null!;
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                FinancialOperation = await FinancialOperationService.GetByIdAsync(Guid.Parse(Id));
+                TransactionTypes = await TransactionTypeService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+    }
+
+    private async Task HandleEdit()
+    {
+        try
+        {
+            await FinancialOperationService.UpdateAsync(FinancialOperation);
+            NavigationManager.NavigateTo("/financialOperations");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

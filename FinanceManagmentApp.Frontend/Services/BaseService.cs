@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
-    public abstract class BaseService
+    internal abstract class BaseService
     {
         private protected readonly HttpClient _httpClient;
         private protected readonly IAuthService _authService;

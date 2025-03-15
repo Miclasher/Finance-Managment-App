@@ -1,9 +1,10 @@
 ﻿using FinanceManagmentApp.Frontend.Services.Abstractions;
+using FinanceManagmentApp.Frontend.Utilities;
 using FinanceManagmentApp.Shared;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
-    public class TransactionTypeService : BaseService, ITransactionTypeService
+    internal sealed class TransactionTypeService : BaseService, ITransactionTypeService
     {
         public TransactionTypeService(IHttpClientFactory httpClientFactory, IAuthService authService) : base(httpClientFactory, authService)
         {
@@ -11,10 +12,12 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task CreateAsync(TransactionTypeForCreateDTO transactionType)
         {
+            ArgumentNullException.ThrowIfNull(transactionType);
+
             await AddAuthorizationHeaderAsync();
             var response = await _httpClient.PostAsJsonAsync("api/TransactionType", transactionType);
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -22,7 +25,7 @@ namespace FinanceManagmentApp.Frontend.Services
             await AddAuthorizationHeaderAsync();
             var response = await _httpClient.DeleteAsync($"api/TransactionType/{id}");
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
         }
 
         public async Task<IEnumerable<TransactionTypeDTO>> GetAllAsync()
@@ -30,7 +33,7 @@ namespace FinanceManagmentApp.Frontend.Services
             await AddAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync("api/TransactionType");
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
 
             var transactionTypes = await response.Content.ReadFromJsonAsync<List<TransactionTypeDTO>>();
 
@@ -42,7 +45,7 @@ namespace FinanceManagmentApp.Frontend.Services
             await AddAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync($"api/TransactionType/{id}");
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
 
             var transactionType = await response.Content.ReadFromJsonAsync<TransactionTypeDTO>();
 
@@ -51,10 +54,12 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task UpdateAsync(TransactionTypeDTO transactionType)
         {
+            ArgumentNullException.ThrowIfNull(transactionType);
+
             await AddAuthorizationHeaderAsync();
             var response = await _httpClient.PutAsJsonAsync("api/TransactionType", transactionType);
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
         }
     }
 }

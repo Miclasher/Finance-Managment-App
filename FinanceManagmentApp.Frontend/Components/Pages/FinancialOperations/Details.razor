@@ -1,0 +1,76 @@
+﻿@page "/financialOperations/{id:Guid}"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject ITransactionTypeService TransactionTypeService
+@inject IFinancialOperationService FinancialOperationService
+
+<h3>Details</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@if (FinancialOperationDTO is null || TransactionTypeDTO is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <dl class="container">
+        <div class="m-3">
+            <dt>Amount</dt>
+            @if (TransactionTypeDTO.IsExpense)
+            {
+                <dd class="text-danger">@(FinancialOperationDTO.Amount * -1)</dd>
+            }
+            else
+            {
+                <dd class="text-success">@FinancialOperationDTO.Amount</dd>
+            }
+        </div>
+        <div class="m-3">
+            <dt>Date</dt>
+            <dd>@FinancialOperationDTO.Date</dd>
+        </div>
+        <div class="m-3">
+            <dt>Comment</dt>
+            <dd>@FinancialOperationDTO.UserComment</dd>
+        </div>
+        <div class="m-3">
+            <dt>Transaction type</dt>
+            <dd>@TransactionTypeDTO.Name</dd>
+        </div>
+    </dl>
+    <button class="btn btn-primary" @onclick="GoBack">Back</button>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private FinancialOperationDTO FinancialOperationDTO { get; set; } = null!;
+    private TransactionTypeDTO TransactionTypeDTO { get; set; } = null!;
+    private string? ErrorMessage { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                FinancialOperationDTO = await FinancialOperationService.GetByIdAsync(Guid.Parse(Id));
+                TransactionTypeDTO = await TransactionTypeService.GetByIdAsync(FinancialOperationDTO.TransactionTypeId);
+
+                StateHasChanged();
+            }
+            catch(Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/financialOperations");
+    }
+}

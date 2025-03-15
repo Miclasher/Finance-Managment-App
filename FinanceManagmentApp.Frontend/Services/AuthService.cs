@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
-    public class AuthService : IAuthService
+    internal sealed class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly IJSRuntime _jsRuntime;
@@ -27,7 +27,7 @@ namespace FinanceManagmentApp.Frontend.Services
         {
             var response = await _httpClient.PostAsJsonAsync("api/Auth/login", userLogin);
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
 
             var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
 
@@ -44,7 +44,7 @@ namespace FinanceManagmentApp.Frontend.Services
         {
             var response = await _httpClient.PostAsJsonAsync("api/Auth/register", userRegister);
 
-            response.EnsureSuccessStatusCode();
+            await response.CustomEnsureSuccessStatusCode();
 
             var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
 
@@ -64,7 +64,7 @@ namespace FinanceManagmentApp.Frontend.Services
             if (string.IsNullOrEmpty(refreshToken))
             {
                 await LogoutAsync();
-                return string.Empty;
+                throw new UnauthorizedAccessException("Refresh token is missing.");
             }
 
             var response = await _httpClient.PostAsJsonAsync("api/Auth/loginWithRefreshToken", refreshToken);
@@ -72,7 +72,7 @@ namespace FinanceManagmentApp.Frontend.Services
             if (!response.IsSuccessStatusCode)
             {
                 await LogoutAsync();
-                return string.Empty;
+                throw new HttpRequestException("Failed to refresh token.");
             }
 
             var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
@@ -80,7 +80,7 @@ namespace FinanceManagmentApp.Frontend.Services
             if (authResponse is null)
             {
                 await LogoutAsync();
-                return string.Empty;
+                throw new InvalidDataException("Failed to get auth response from server response.");
             }
 
             await SaveTokens(authResponse);

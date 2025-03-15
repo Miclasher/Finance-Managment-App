@@ -25,8 +25,8 @@
 </EditForm>
 
 @code {
-    string? ErrorMessage { get; set; }
-    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO();
+    private string? ErrorMessage { get; set; }
+    private UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO();
 
     private async Task HandleLogin()
     {
@@ -35,9 +35,9 @@
             await AuthService.LoginAsync(UserLoginDTO);
             NavigationManager.NavigateTo("/");
         }
-        catch
+        catch(Exception ex)
         {
-            ErrorMessage = "Failed to login. Please, try again";
+            ErrorMessage = ex.Message;
         }
     }
 }

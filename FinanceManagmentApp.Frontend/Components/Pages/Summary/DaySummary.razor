@@ -1,0 +1,65 @@
+﻿@page "/daySummary"
+@rendermode InteractiveServer
+@inject ISummaryService SummaryService
+<h3>DaySummary</h3>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+<div class="container">
+    <h5>Enter a day to get summary for it:</h5>
+    <InputDate @bind-Value="Date" />
+    <button class="btn btn-primary m-3" @onclick="GetDaySummary">Get Day Summary</button>
+</div>
+
+@if (Summary is not null)
+{
+    <div class="container">
+        <dl>
+            <div class="m-3">
+                <dt>Income</dt>
+                <dd class="text-success">@Summary.TotalIncome</dd>
+            </div>
+            <div class="m-3">
+                <dt>Expenses</dt>
+                <dd class="text-danger">@Summary.TotalIncome</dd>
+            </div>
+        </dl>
+        <table class="table m-3">
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var financialOperation in Summary.Operations)
+                {
+                    <tr>
+                        <td>@financialOperation.Amount</td>
+                        <td>@financialOperation.Date</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    private SummaryDTO Summary { get; set; } = null!;
+    private string? ErrorMessage { get; set; }
+
+    private async Task GetDaySummary()
+    {
+        try
+        {
+            Summary = await SummaryService.GetDaySummary(Date);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

@@ -1,0 +1,66 @@
+﻿@page "/transactionTypes/edit/{id:Guid}/"
+@rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
+@inject NavigationManager NavigationManager
+<h3>Edit</h3>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@if (TransactionType is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm model="TransactionType" class="container" OnValidSubmit="HandleEdit">
+        <DataAnnotationsValidator />
+        <div class="m-3">
+            <label class="form-label" for="name">Name: </label>
+            <InputText class="form-control" id="name" @bind-Value="TransactionType.Name" />
+            <ValidationMessage For="@(() => TransactionType.Name)" />
+        </div>
+        <div class="m-3">
+            <label class="form-label" for="isExpense">Is Expense: </label>
+            <InputCheckbox class="form-check-input" id="isExpense" @bind-Value="TransactionType.IsExpense" />
+            <ValidationMessage For="@(() => TransactionType.IsExpense)" />
+        </div>
+        <button class="btn btn-primary m-3" type="submit">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private TransactionTypeDTO TransactionType { get; set; } = null!;
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                TransactionType = await TransactionTypeService.GetByIdAsync(Guid.Parse(Id));
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+    }
+
+    private async Task HandleEdit()
+    {
+        try
+        {
+            await TransactionTypeService.UpdateAsync(TransactionType);
+            NavigationManager.NavigateTo("/transactionTypes");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

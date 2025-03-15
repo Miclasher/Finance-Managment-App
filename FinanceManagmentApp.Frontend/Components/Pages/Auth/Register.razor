@@ -4,10 +4,12 @@
 @inject NavigationManager NavigationManager
 
 <h3>Register</h3>
+
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <p class="text-danger">@ErrorMessage</p>
 }
+
 <EditForm class="container" model="UserRegisterDTO" OnValidSubmit="HandleRegistration">
     <DataAnnotationsValidator />
     <div class="m-3">
@@ -32,9 +34,11 @@
     </div>
     <button class="btn btn-primary m-3" type="submit">Register</button>
 </EditForm>
+
 @code {
-    UserRegisterDTO UserRegisterDTO { get; set; } = new UserRegisterDTO();
-    string? ErrorMessage { get; set; } = null;
+    private UserRegisterDTO UserRegisterDTO { get; set; } = new UserRegisterDTO();
+    private string? ErrorMessage { get; set; } = null;
+
     private async Task HandleRegistration()
     {
         try
@@ -42,9 +46,9 @@
             await AuthService.RegisterAsync(UserRegisterDTO);
             NavigationManager.NavigateTo("/");
         }
-        catch
+        catch(Exception ex)
         {
-            ErrorMessage = "Failed to register. Please, try again";
+            ErrorMessage = ex.Message;
         }
     }
 }

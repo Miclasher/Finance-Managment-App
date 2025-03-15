@@ -24,6 +24,8 @@ namespace FinanceManagmentApp.Frontend
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();
+            builder.Services.AddScoped<IFinancialOperationService, FinancialOperationService>();
+            builder.Services.AddScoped<ISummaryService, SummaryService>();
 
             builder.Services.AddAuthorization();
 

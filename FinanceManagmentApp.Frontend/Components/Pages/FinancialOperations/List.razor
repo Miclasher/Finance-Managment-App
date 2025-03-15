@@ -1,0 +1,118 @@
+﻿@page "/financialOperations"
+@rendermode InteractiveServer
+@inject IFinancialOperationService FinancialOperationService
+@inject ITransactionTypeService TransactionTypeService
+@inject NavigationManager NavigationManager
+
+<div class="hstack">
+    <h3>Financial Operations</h3>
+    @if (CanBeCreated)
+    {
+        <button class="btn btn-primary m-3" @onclick="CreateFinancialOperation">Create</button>
+    }
+    else
+    {
+        <p class="text-danger m-3">Create transaction type before creating any financial operations</p>
+    }
+</div>
+
+@if (string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@if (FinancialOperations is null)
+{
+    <p>Loading...</p>
+}
+else if (!FinancialOperations.Any())
+{
+    <p>No financial operations found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var financialOperation in FinancialOperations)
+            {
+                <tr>
+                    <td>@financialOperation.Amount</td>
+                    <td>@financialOperation.Date</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteFinancialOperation(financialOperation.Id)">Delete</button>
+                        <button class="btn btn-primary" @onclick="() => EditFinancialOperation(financialOperation.Id)">Edit</button>
+                        <button class="btn btn-primary" @onclick="() => DetailsOfFinancialOperation(financialOperation.Id)">Details</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<FinancialOperationDTO> FinancialOperations { get; set; } = null!;
+    private bool CanBeCreated { get; set; } = false;
+    private string? ErrorMessage { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                CanBeCreated = (await TransactionTypeService.GetAllAsync()).Any();
+
+                if (CanBeCreated)
+                {
+                    FinancialOperations = await FinancialOperationService.GetAllAsync();
+                }
+                else
+                {
+                    FinancialOperations = new List<FinancialOperationDTO>();
+                }
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+    }
+
+    private void CreateFinancialOperation()
+    {
+        NavigationManager.NavigateTo("/financialOperations/create");
+    }
+
+    private void EditFinancialOperation(Guid id)
+    {
+        NavigationManager.NavigateTo($"/financialOperations/edit/{id}");
+    }
+
+    private void DetailsOfFinancialOperation(Guid id)
+    {
+        NavigationManager.NavigateTo($"/financialOperations/{id}");
+    }
+
+    private async Task DeleteFinancialOperation(Guid id)
+    {
+        try
+        {
+            await FinancialOperationService.DeleteAsync(id);
+            FinancialOperations = await FinancialOperationService.GetAllAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

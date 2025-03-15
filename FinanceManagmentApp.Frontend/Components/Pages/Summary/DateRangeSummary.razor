@@ -1,16 +1,28 @@
-﻿@page "/daySummary"
+﻿@page "/dateRangeSummary"
 @rendermode InteractiveServer
 @inject ISummaryService SummaryService
-<h3>DaySummary</h3>
+<h3>Date Range Summary</h3>
+
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <p class="text-danger">@ErrorMessage</p>
 }
 
 <div class="container">
-    <h5>Enter a day to get summary for it:</h5>
-    <InputDate @bind-Value="Date" />
-    <button class="btn btn-primary m-3" @onclick="GetDaySummary">Get Day Summary</button>
+    <h5>Enter a date range to get summary for it:</h5>
+    <EditForm Model="DateRange" OnValidSubmit="GetDateRangeSummary">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="m-3">
+            <label for="StartDate">Start Date:</label>
+            <InputDate id="StartDate" @bind-Value="DateRange.StartDate" />
+        </div>
+        <div class="m-3">
+            <label for="EndDate">End Date:</label>
+            <InputDate id="EndDate" @bind-Value="DateRange.EndDate" />
+        </div>
+        <button type="submit" class="btn btn-primary m-3">Get Date Range Summary</button>
+    </EditForm>
 </div>
 
 @if (Summary is not null)
@@ -47,15 +59,19 @@
 }
 
 @code {
-    private DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    private DateRangeDTO DateRange { get; set; } = new DateRangeDTO
+        {
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            EndDate = DateOnly.FromDateTime(DateTime.UtcNow)
+        };
     private SummaryDTO Summary { get; set; } = null!;
     private string? ErrorMessage { get; set; }
 
-    private async Task GetDaySummary()
+    private async Task GetDateRangeSummary()
     {
         try
         {
-            Summary = await SummaryService.GetDaySummary(Date);
+            Summary = await SummaryService.GetDateRangeSummary(DateRange);
         }
         catch (Exception ex)
         {

@@ -14,7 +14,7 @@ namespace FinanceManagmentApp.Frontend.Services
         public async Task<SummaryDTO> GetDateRangeSummary(DateRangeDTO dateRange)
         {
             await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PostAsJsonAsync("api/dateRangeSummary/", dateRange);
+            var response = await _httpClient.PostAsJsonAsync("api/Summary/dateRangeSummary/", dateRange);
 
             await response.CustomEnsureSuccessStatusCode();
 
@@ -26,7 +26,7 @@ namespace FinanceManagmentApp.Frontend.Services
         public async Task<SummaryDTO> GetDaySummary(DateOnly dateOnly)
         {
             await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PostAsJsonAsync("api/daySummary/", dateOnly);
+            var response = await _httpClient.PostAsJsonAsync("api/Summary/daySummary/", dateOnly);
 
             await response.CustomEnsureSuccessStatusCode();
 

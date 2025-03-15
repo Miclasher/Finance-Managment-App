@@ -4,28 +4,47 @@
 @inject NavigationManager NavigationManager
 
 <h3>Register</h3>
-<div class="container">
-    <input @bind="UserRegisterDTO.DisplayName" class="form-control m-3" placeholder="Display Name" />
-    <input @bind="UserRegisterDTO.Username" class="form-control m-3" placeholder="Username" />
-    <input @bind="UserRegisterDTO.PlainPassword" type="password" class="form-control m-3" placeholder="Password" />
-    <input @bind="UserRegisterDTO.Email" class="form-control m-3" type="email" placeholder="Email" />
-    <button class="btn btn-primary m-3" @onclick="RegisterUserAsync">Register</button>
-</div>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+<EditForm class="container" model="UserRegisterDTO" OnValidSubmit="HandleRegistration">
+    <DataAnnotationsValidator />
+    <div class="m-3">
+        <label class="form-label" for="displayName">Display Name</label>
+        <InputText class="form-control" id="displayName" @bind-Value="UserRegisterDTO.DisplayName" />
+        <ValidationMessage For="@(() => UserRegisterDTO.DisplayName)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="username">Username</label>
+        <InputText class="form-control" id="username" @bind-Value="UserRegisterDTO.Username" />
+        <ValidationMessage For="@(() => UserRegisterDTO.Username)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="password">Password</label>
+        <InputText class="form-control" id="password" type="password" @bind-Value="UserRegisterDTO.PlainPassword" />
+        <ValidationMessage For="@(() => UserRegisterDTO.PlainPassword)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="email">Email</label>
+        <InputText class="form-control" id="email" @bind-Value="UserRegisterDTO.Email" />
+        <ValidationMessage For="@(() => UserRegisterDTO.Email)" />
+    </div>
+    <button class="btn btn-primary m-3" type="submit">Register</button>
+</EditForm>
 @code {
     UserRegisterDTO UserRegisterDTO { get; set; } = new UserRegisterDTO();
-    string? ErrorMessage { get; set; }
-
-    private async Task RegisterUserAsync()
+    string? ErrorMessage { get; set; } = null;
+    private async Task HandleRegistration()
     {
-        var success = await AuthService.RegisterAsync(UserRegisterDTO);
-        if (success)
+        try
         {
+            await AuthService.RegisterAsync(UserRegisterDTO);
             NavigationManager.NavigateTo("/");
         }
-        else
+        catch
         {
-            ErrorMessage = "Failed to register.";
-            StateHasChanged();
+            ErrorMessage = "Failed to register. Please, try again";
         }
     }
 }

@@ -23,47 +23,38 @@ namespace FinanceManagmentApp.Frontend.Services
             _jsRuntime = jsRuntime;
         }
 
-        public async Task<bool> LoginAsync(UserLoginDTO userLogin)
+        public async Task LoginAsync(UserLoginDTO userLogin)
         {
             var response = await _httpClient.PostAsJsonAsync("api/Auth/login", userLogin);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
-
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
-
-            if (authResponse == null)
-            {
-                return false;
-            }
-
-            await SaveTokens(authResponse);
-            (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
-            return true;
-        }
-
-        public async Task<bool> RegisterAsync(UserRegisterDTO userRegister)
-        {
-            var response = await _httpClient.PostAsJsonAsync("api/Auth/register", userRegister);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
+            response.EnsureSuccessStatusCode();
 
             var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
 
             if (authResponse is null)
             {
-                return false;
+                throw new InvalidDataException("Failed to get auth response from server response.");
             }
 
             await SaveTokens(authResponse);
             (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
+        }
 
-            return true;
+        public async Task RegisterAsync(UserRegisterDTO userRegister)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Auth/register", userRegister);
+
+            response.EnsureSuccessStatusCode();
+
+            var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
+
+            if (authResponse is null)
+            {
+                throw new InvalidDataException("Failed to get auth response from server response.");
+            }
+
+            await SaveTokens(authResponse);
+            (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
         }
 
         public async Task<string> RefreshTokenAsync()

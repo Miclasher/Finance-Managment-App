@@ -1,9 +1,9 @@
 ﻿@page "/transactionTypes"
 @rendermode InteractiveServer
 @inject ITransactionTypeService TransactionTypeService
-@inject IAuthService AuthService
 
-<h3>List</h3>
+<h3>Transaction Types</h3>
+
 @if (TransactionTypes is null)
 {
     <p>Loading...</p>
@@ -14,14 +14,41 @@ else if (!TransactionTypes.Any())
 }
 else
 {
-    @foreach (var transactionType in TransactionTypes)
-    {
-        <p>@transactionType.Name</p>
-    }
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Is Expense</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transactionType in TransactionTypes)
+            {
+                <tr>
+                    <td>@transactionType.Name</td>
+                    <td>
+                        @if (transactionType.IsExpense)
+                        {
+                            <p>Yes</p>
+                        }
+                        else
+                        {
+                            <p>No</p>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteTransactionType(transactionType.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {
     IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
+    TransactionTypeDTO CurrentTransactionType { get; set; } = new TransactionTypeDTO();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -30,5 +57,12 @@ else
             TransactionTypes = await TransactionTypeService.GetAllAsync();
             StateHasChanged();
         }
+    }
+
+    private async Task DeleteTransactionType(Guid id)
+    {
+        await TransactionTypeService.DeleteAsync(id);
+        TransactionTypes = await TransactionTypeService.GetAllAsync();
+        StateHasChanged();
     }
 }

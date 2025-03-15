@@ -9,27 +9,35 @@
     <p class="text-danger">@ErrorMessage</p>
 }
 
-<div class="container">
-    <input @bind="UserLoginDTO.Username" class="form-control m-3" placeholder="Username" />
-    <input @bind="UserLoginDTO.Password" type="password" class="form-control m-3" placeholder="Password" />
-    <button class="btn btn-primary m-3" @onclick="LoginUserAsync">Login</button>
-</div>
+<EditForm model="UserLoginDTO" class="container" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <div class="m-3">
+        <label class="form-label" for="username">Username: </label>
+        <InputText class="form-control" id="username" @bind-Value="UserLoginDTO.Username" />
+        <ValidationMessage For="@(() => UserLoginDTO.Username)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="password">Password: </label>
+        <InputText class="form-control" id="password" @bind-Value="UserLoginDTO.Password" type="password" />
+        <ValidationMessage For="@(() => UserLoginDTO.Password)" />
+    </div>
+    <button class="btn btn-primary m-3" type="submit">Login</button>
+</EditForm>
 
 @code {
     string? ErrorMessage { get; set; }
     UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO();
 
-    private async Task LoginUserAsync()
+    private async Task HandleLogin()
     {
-        var success = await AuthService.LoginAsync(UserLoginDTO);
-        if (success)
+        try
         {
+            await AuthService.LoginAsync(UserLoginDTO);
             NavigationManager.NavigateTo("/");
         }
-        else
+        catch
         {
-            ErrorMessage = "Failed to login.";
-            StateHasChanged();
+            ErrorMessage = "Failed to login. Please, try again";
         }
     }
 }

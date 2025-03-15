@@ -1,6 +1,5 @@
 ﻿using FinanceManagmentApp.Frontend.Services.Abstractions;
 using FinanceManagmentApp.Shared;
-using System.Net.Http.Headers;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
@@ -10,14 +9,20 @@ namespace FinanceManagmentApp.Frontend.Services
         {
         }
 
-        public Task<TransactionTypeDTO> CreateAsync(TransactionTypeForCreateDTO transactionType)
+        public async Task CreateAsync(TransactionTypeForCreateDTO transactionType)
         {
-            throw new NotImplementedException();
+            await AddAuthorizationHeaderAsync();
+            var response = await _httpClient.PostAsJsonAsync("api/TransactionType", transactionType);
+
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await AddAuthorizationHeaderAsync();
+            var response = await _httpClient.DeleteAsync($"api/TransactionType/{id}");
+
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task<IEnumerable<TransactionTypeDTO>> GetAllAsync()
@@ -28,17 +33,28 @@ namespace FinanceManagmentApp.Frontend.Services
             response.EnsureSuccessStatusCode();
 
             var transactionTypes = await response.Content.ReadFromJsonAsync<List<TransactionTypeDTO>>();
-            return transactionTypes!;
+
+            return transactionTypes! ?? throw new InvalidDataException("Failed to get transaction types from server response.");
         }
 
-        public Task<TransactionTypeDTO> GetByIdAsync(Guid id)
+        public async Task<TransactionTypeDTO> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await AddAuthorizationHeaderAsync();
+            var response = await _httpClient.GetAsync($"api/TransactionType/{id}");
+
+            response.EnsureSuccessStatusCode();
+
+            var transactionType = await response.Content.ReadFromJsonAsync<TransactionTypeDTO>();
+
+            return transactionType ?? throw new InvalidDataException("Failed to get transaction type from server response.");
         }
 
-        public Task<TransactionTypeDTO> UpdateAsync(TransactionTypeDTO transactionType)
+        public async Task UpdateAsync(TransactionTypeDTO transactionType)
         {
-            throw new NotImplementedException();
+            await AddAuthorizationHeaderAsync();
+            var response = await _httpClient.PutAsJsonAsync("api/TransactionType", transactionType);
+
+            response.EnsureSuccessStatusCode();
         }
     }
 }

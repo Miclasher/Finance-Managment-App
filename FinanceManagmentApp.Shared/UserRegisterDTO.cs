@@ -11,7 +11,6 @@ namespace FinanceManagmentApp.Shared
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
         [Required]
-
         public string PlainPassword { get; set; } = string.Empty;
         [Required]
         [MaxLength(150)]

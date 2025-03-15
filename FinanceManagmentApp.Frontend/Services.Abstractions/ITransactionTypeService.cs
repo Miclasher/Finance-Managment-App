@@ -6,8 +6,8 @@ namespace FinanceManagmentApp.Frontend.Services.Abstractions
     {
         Task<IEnumerable<TransactionTypeDTO>> GetAllAsync();
         Task<TransactionTypeDTO> GetByIdAsync(Guid id);
-        Task<TransactionTypeDTO> CreateAsync(TransactionTypeForCreateDTO transactionType);
-        Task<TransactionTypeDTO> UpdateAsync(TransactionTypeDTO transactionType);
+        Task CreateAsync(TransactionTypeForCreateDTO transactionType);
+        Task UpdateAsync(TransactionTypeDTO transactionType);
         Task DeleteAsync(Guid id);
     }
 }

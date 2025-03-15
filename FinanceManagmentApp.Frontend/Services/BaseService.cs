@@ -1,5 +1,5 @@
-﻿using System.Net.Http.Headers;
-using FinanceManagmentApp.Frontend.Services.Abstractions;
+﻿using FinanceManagmentApp.Frontend.Services.Abstractions;
+using System.Net.Http.Headers;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
@@ -8,7 +8,7 @@ namespace FinanceManagmentApp.Frontend.Services
         private protected readonly HttpClient _httpClient;
         private protected readonly IAuthService _authService;
 
-        public BaseService(IHttpClientFactory httpClientFactory, IAuthService authService)
+        protected BaseService(IHttpClientFactory httpClientFactory, IAuthService authService)
         {
             _httpClient = httpClientFactory.CreateClient("FinanceManagmentAppAPI");
             _authService = authService;

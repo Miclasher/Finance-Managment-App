@@ -72,9 +72,11 @@
         try
         {
             Summary = await SummaryService.GetDateRangeSummary(DateRange);
+            ErrorMessage = null;
         }
         catch (Exception ex)
         {
+            Summary = null!;
             ErrorMessage = ex.Message;
         }
     }

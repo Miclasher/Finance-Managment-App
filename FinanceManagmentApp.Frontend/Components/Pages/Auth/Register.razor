@@ -1,0 +1,31 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<h3>Register</h3>
+<div class="container">
+    <input @bind="UserRegisterDTO.DisplayName" class="form-control m-3" placeholder="Display Name" />
+    <input @bind="UserRegisterDTO.Username" class="form-control m-3" placeholder="Username" />
+    <input @bind="UserRegisterDTO.PlainPassword" type="password" class="form-control m-3" placeholder="Password" />
+    <input @bind="UserRegisterDTO.Email" class="form-control m-3" type="email" placeholder="Email" />
+    <button class="btn btn-primary m-3" @onclick="RegisterUserAsync">Register</button>
+</div>
+@code {
+    UserRegisterDTO UserRegisterDTO { get; set; } = new UserRegisterDTO();
+    string? ErrorMessage { get; set; }
+
+    private async Task RegisterUserAsync()
+    {
+        var success = await AuthService.RegisterAsync(UserRegisterDTO);
+        if (success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = "Failed to register.";
+            StateHasChanged();
+        }
+    }
+}

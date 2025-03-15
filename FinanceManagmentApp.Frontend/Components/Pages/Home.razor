@@ -1,8 +1,13 @@
 ﻿@page "/"
-
+@using Microsoft.AspNetCore.Components.Authorization
 <PageTitle>Home</PageTitle>
 
 <h1>Hello!</h1>
-<p>
-    In order to use app you need to login/register first.
-</p>
+<AuthorizeView>
+    <Authorized>
+        <p>Now you have access to all functionality</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>In order to use app you need to login/register first.</p>
+    </NotAuthorized>
+</AuthorizeView>

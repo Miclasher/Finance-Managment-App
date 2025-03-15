@@ -1,6 +1,7 @@
 using FinanceManagmentApp.Frontend.Components;
 using FinanceManagmentApp.Frontend.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FinanceManagmentApp.Frontend.Services.Abstractions;
+using FinanceManagmentApp.Frontend.Utilities;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace FinanceManagmentApp.Frontend
@@ -18,17 +19,11 @@ namespace FinanceManagmentApp.Frontend
             builder.Services.AddHttpClient("FinanceManagmentAppAPI",
                 client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.Audience = builder.Configuration["Jwt:Audience"];
-                    options.Authority = builder.Configuration["ApiBaseUrl"];
-                });
-
             builder.Services.AddSingleton<CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 
-            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();
 
             builder.Services.AddAuthorization();
 
@@ -50,7 +45,6 @@ namespace FinanceManagmentApp.Frontend
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.Run();

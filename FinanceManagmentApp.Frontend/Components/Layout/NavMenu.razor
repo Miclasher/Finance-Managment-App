@@ -17,14 +17,31 @@
 
             <AuthorizeView>
                 <Authorized>
+                    <NavLink class="nav-link" href="/transactionTypes" Match="NavLinkMatch.All">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Transaction Types
+                    </NavLink>
+                    <NavLink class="nav-link" href="/financialOperations" Match="NavLinkMatch.All">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Financial Operations
+                    </NavLink>
+                    <NavLink class="nav-link" href="/daySummary" Match="NavLinkMatch.All">
+                        Day Summary
+                    </NavLink>
+                    <NavLink class="nav-link" href="/dateRangeSummary" Match="NavLinkMatch.All">
+                        Date Range Summary
+                    </NavLink>
                     <NavLink class="nav-link" style="position: absolute; bottom: 0;" href="/logout" Match="NavLinkMatch.All">
-                        <span class="bi" aria-hidden="true"></span> Sign out
+                        Sign out
                     </NavLink>
                 </Authorized>
                 <NotAuthorized>
-                    <NavLink class="nav-link" style="position: absolute; bottom: 0;" href="/login" Match="NavLinkMatch.All">
-                        <span class="bi" aria-hidden="true"></span> Sign in
-                    </NavLink>
+                    <div style="position: absolute; bottom: 0;" class="container">
+                        <NavLink class="nav-link" href="/login" Match="NavLinkMatch.All">
+                            Sign in
+                        </NavLink>
+                        <NavLink class="nav-link" href="/register" Match="NavLinkMatch.All">
+                            Sign up
+                        </NavLink>
+                    </div>
                 </NotAuthorized>
             </AuthorizeView>
         </div>

@@ -1,0 +1,34 @@
+﻿@page "/transactionTypes"
+@rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
+@inject IAuthService AuthService
+
+<h3>List</h3>
+@if (TransactionTypes is null)
+{
+    <p>Loading...</p>
+}
+else if (!TransactionTypes.Any())
+{
+    <p>No transaction types found.</p>
+}
+else
+{
+    @foreach (var transactionType in TransactionTypes)
+    {
+        <p>@transactionType.Name</p>
+    }
+}
+
+@code {
+    IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            TransactionTypes = await TransactionTypeService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+}

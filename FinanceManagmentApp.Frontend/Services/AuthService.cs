@@ -1,11 +1,13 @@
-﻿using FinanceManagmentApp.Shared;
+﻿using FinanceManagmentApp.Frontend.Services.Abstractions;
+using FinanceManagmentApp.Frontend.Utilities;
+using FinanceManagmentApp.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly IJSRuntime _jsRuntime;
@@ -103,9 +105,9 @@ namespace FinanceManagmentApp.Frontend.Services
             (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogout();
         }
 
-        public async Task<string> GetAccessToke()
+        public async Task<string> GetAccessTokenAsync()
         {
-            var accessToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", accessTokenKey);
+            var accessToken = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", accessTokenKey);
 
             if (string.IsNullOrEmpty(accessToken) || IsTokenExpired(accessToken))
             {

@@ -1,6 +1,6 @@
 ﻿@page "/login"
 @rendermode InteractiveServer
-@inject AuthService AuthService
+@inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
 <h3>Login</h3>
@@ -17,7 +17,7 @@
 
 @code {
     string? ErrorMessage { get; set; }
-    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO() { Username = string.Empty, Password = string.Empty };
+    UserLoginDTO UserLoginDTO { get; set; } = new UserLoginDTO();
 
     private async Task LoginUserAsync()
     {

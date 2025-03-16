@@ -80,7 +80,7 @@ namespace FinanceManagmentApp.Services
         {
             ArgumentNullException.ThrowIfNull(finOp);
 
-            var finOpToUpdate = await _repositoryManager.FinancialOperation.GetByIdAsync(finOp.Id, cancellationToken)
+            var finOpToUpdate = await _repositoryManager.FinancialOperation.GetByIdWithoutTransactionType(finOp.Id, cancellationToken)
                 ?? throw new KeyNotFoundException($"Financial operation with id {finOp.Id} was not found in database.");
 
             if (finOpToUpdate.UserId != userId)

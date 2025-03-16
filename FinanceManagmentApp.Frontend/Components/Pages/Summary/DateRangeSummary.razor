@@ -1,5 +1,6 @@
 ﻿@page "/dateRangeSummary"
 @rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
 @inject ISummaryService SummaryService
 <h3>Date Range Summary</h3>
 
@@ -43,14 +44,29 @@
                 <tr>
                     <th>Amount</th>
                     <th>Date</th>
+                    <th>Comment</th>
+                    <th>Transaction Type</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var financialOperation in Summary.Operations)
                 {
+                    var transactionType = TransactionTypes.First(tt => tt.Id == financialOperation.TransactionTypeId);
                     <tr>
-                        <td>@financialOperation.Amount</td>
+
+                        <td>
+                            @if (transactionType.IsExpense)
+                            {
+                                <p class="text-danger">-@financialOperation.Amount</p>
+                            }
+                            else
+                            {
+                                <p class="text-success">@financialOperation.Amount</p>
+                            }
+                        </td>
                         <td>@financialOperation.Date</td>
+                        <td>@financialOperation.UserComment</td>
+                        <td>@transactionType.Name</td>
                     </tr>
                 }
             </tbody>
@@ -65,7 +81,16 @@
             EndDate = DateOnly.FromDateTime(DateTime.UtcNow)
         };
     private SummaryDTO Summary { get; set; } = null!;
+    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
     private string? ErrorMessage { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            TransactionTypes = await TransactionTypeService.GetAllAsync();
+        }
+    }
 
     private async Task GetDateRangeSummary()
     {

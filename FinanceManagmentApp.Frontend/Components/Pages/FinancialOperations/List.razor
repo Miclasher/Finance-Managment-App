@@ -36,15 +36,29 @@ else
             <tr>
                 <th>Amount</th>
                 <th>Date</th>
+                <th>Comment</th>
+                <th>Transaction Type</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var financialOperation in FinancialOperations)
             {
+                var transactionType = TransactionTypes.First(tt => tt.Id == financialOperation.TransactionTypeId);
                 <tr>
-                    <td>@financialOperation.Amount</td>
+                    <td>
+                        @if (transactionType.IsExpense)
+                        {
+                            <p class="text-danger">-@financialOperation.Amount</p>
+                        }
+                        else
+                        {
+                            <p class="text-success">@financialOperation.Amount</p>
+                        }
+                    </td>
                     <td>@financialOperation.Date</td>
+                    <td>@financialOperation.UserComment</td>
+                    <td>@transactionType.Name</td>
                     <td>
                         <button class="btn btn-danger" @onclick="() => DeleteFinancialOperation(financialOperation.Id)">Delete</button>
                         <button class="btn btn-primary" @onclick="() => EditFinancialOperation(financialOperation.Id)">Edit</button>
@@ -58,6 +72,7 @@ else
 
 @code {
     private IEnumerable<FinancialOperationDTO> FinancialOperations { get; set; } = null!;
+    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = null!;
     private bool CanBeCreated { get; set; } = false;
     private string? ErrorMessage { get; set; }
 
@@ -67,7 +82,8 @@ else
         {
             try
             {
-                CanBeCreated = (await TransactionTypeService.GetAllAsync()).Any();
+                TransactionTypes = await TransactionTypeService.GetAllAsync();
+                CanBeCreated = TransactionTypes.Any();
 
                 if (CanBeCreated)
                 {

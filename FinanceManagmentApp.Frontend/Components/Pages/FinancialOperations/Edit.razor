@@ -44,6 +44,10 @@ else
             <InputDate class="form-control" id="date" @bind-Value="FinancialOperation.Date" />
             <ValidationMessage For="@(() => FinancialOperation.Date)" />
         </div>
+        <div class="m-3">
+            <label class="form-label" for="time">Time: </label>
+            <input class="form-control" if="time" type="time" @bind="TimeInput" />
+        </div>
         <button class="btn btn-primary m-3" type="submit">Save</button>
     </EditForm>
 }
@@ -52,6 +56,7 @@ else
     [Parameter] public string Id { get; set; } = string.Empty;
     private FinancialOperationDTO FinancialOperation { get; set; } = null!;
     private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = null!;
+    private TimeOnly TimeInput { get; set; }
     private string? ErrorMessage { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -61,6 +66,8 @@ else
             try
             {
                 FinancialOperation = await FinancialOperationService.GetByIdAsync(Guid.Parse(Id));
+                TimeInput = TimeOnly.FromDateTime(FinancialOperation.Date);
+
                 TransactionTypes = await TransactionTypeService.GetAllAsync();
                 StateHasChanged();
             }
@@ -75,6 +82,8 @@ else
     {
         try
         {
+            FinancialOperation.Date = FinancialOperation.Date.Date.Add(TimeInput.ToTimeSpan());
+
             await FinancialOperationService.UpdateAsync(FinancialOperation);
             NavigationManager.NavigateTo("/financialOperations");
         }

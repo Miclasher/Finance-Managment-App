@@ -36,7 +36,7 @@ namespace FinanceManagmentApp.Frontend.Services
             var response = await _httpClient.SendAsync(new HttpRequestMessage()
             {
                 Method = method,
-                RequestUri = new Uri(url),
+                RequestUri = new Uri(url, UriKind.Relative),
                 Content = data == null ? null : JsonContent.Create(data, mediaType: null)
             });
 

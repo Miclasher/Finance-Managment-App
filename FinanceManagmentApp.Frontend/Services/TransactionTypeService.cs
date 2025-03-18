@@ -28,7 +28,7 @@ namespace FinanceManagmentApp.Frontend.Services
 
             var transactionTypes = await response.Content.ReadFromJsonAsync<List<TransactionTypeDTO>>();
 
-            return transactionTypes! ?? throw new InvalidDataException("Failed to get transaction types from server response.");
+            return transactionTypes ?? throw new InvalidDataException("Failed to get transaction types from server response.");
         }
 
         public async Task<TransactionTypeDTO> GetByIdAsync(Guid id)

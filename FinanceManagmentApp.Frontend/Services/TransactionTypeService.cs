@@ -14,26 +14,17 @@ namespace FinanceManagmentApp.Frontend.Services
         {
             ArgumentNullException.ThrowIfNull(transactionType);
 
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PostAsJsonAsync("api/TransactionType", transactionType);
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync("api/TransactionType", HttpMethod.Post, transactionType);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.DeleteAsync($"api/TransactionType/{id}");
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync($"api/TransactionType/{id}", HttpMethod.Delete);
         }
 
         public async Task<IEnumerable<TransactionTypeDTO>> GetAllAsync()
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.GetAsync("api/TransactionType");
-
-            await response.CustomEnsureSuccessStatusCode();
+            var response = await SendAsync("api/TransactionType", HttpMethod.Get);
 
             var transactionTypes = await response.Content.ReadFromJsonAsync<List<TransactionTypeDTO>>();
 
@@ -42,10 +33,7 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task<TransactionTypeDTO> GetByIdAsync(Guid id)
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.GetAsync($"api/TransactionType/{id}");
-
-            await response.CustomEnsureSuccessStatusCode();
+            var response = await SendAsync($"api/TransactionType/{id}", HttpMethod.Get);
 
             var transactionType = await response.Content.ReadFromJsonAsync<TransactionTypeDTO>();
 
@@ -56,10 +44,7 @@ namespace FinanceManagmentApp.Frontend.Services
         {
             ArgumentNullException.ThrowIfNull(transactionType);
 
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PutAsJsonAsync("api/TransactionType", transactionType);
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync("api/TransactionType", HttpMethod.Put, transactionType);
         }
     }
 }

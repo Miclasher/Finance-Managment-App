@@ -1,6 +1,7 @@
 ﻿using FinanceManagmentApp.Frontend.Services.Abstractions;
 using FinanceManagmentApp.Frontend.Utilities;
 using FinanceManagmentApp.Shared;
+using System.Runtime.InteropServices;
 
 namespace FinanceManagmentApp.Frontend.Services
 {
@@ -14,26 +15,17 @@ namespace FinanceManagmentApp.Frontend.Services
         {
             ArgumentNullException.ThrowIfNull(financialOperation);
 
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PostAsJsonAsync("api/FinancialOperation", financialOperation);
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync("api/FinancialOperation", HttpMethod.Post, financialOperation);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.DeleteAsync($"api/FinancialOperation/{id}");
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync($"api/FinancialOperation/{id}", HttpMethod.Delete);
         }
 
         public async Task<IEnumerable<FinancialOperationDTO>> GetAllAsync()
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.GetAsync("api/FinancialOperation");
-
-            await response.CustomEnsureSuccessStatusCode();
+            var response = await SendAsync("api/FinancialOperation", HttpMethod.Get);
 
             var financialOperations = await response.Content.ReadFromJsonAsync<List<FinancialOperationDTO>>();
 
@@ -42,10 +34,7 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task<FinancialOperationDTO> GetByIdAsync(Guid id)
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.GetAsync($"api/FinancialOperation/{id}");
-
-            await response.CustomEnsureSuccessStatusCode();
+            var response = await SendAsync($"api/FinancialOperation/{id}", HttpMethod.Get);
 
             var financialOperation = await response.Content.ReadFromJsonAsync<FinancialOperationDTO>();
 
@@ -54,10 +43,7 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task UpdateAsync(FinancialOperationDTO financialOperation)
         {
-            await AddAuthorizationHeaderAsync();
-            var response = await _httpClient.PutAsJsonAsync("api/FinancialOperation", financialOperation);
-
-            await response.CustomEnsureSuccessStatusCode();
+            await SendAsync("api/FinancialOperation", HttpMethod.Put, financialOperation);
         }
     }
 }

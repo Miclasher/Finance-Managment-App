@@ -17,10 +17,10 @@ namespace FinanceManagmentApp.Frontend
                 .AddInteractiveServerComponents();
 
             builder.Services.AddHttpClient("FinanceManagmentAppAPI",
-                client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
+                (sp, client)
+                => client.BaseAddress = new Uri(sp.GetRequiredService<IConfiguration>()["ApiBaseUrl"]!));
 
-            builder.Services.AddSingleton<CustomAuthenticationStateProvider>();
-            builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+            builder.Services.AddSingleton<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();

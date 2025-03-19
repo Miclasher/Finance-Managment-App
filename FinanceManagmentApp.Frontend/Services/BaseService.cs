@@ -51,5 +51,12 @@ namespace FinanceManagmentApp.Frontend.Services
 
             return await response.Content.ReadFromJsonAsync<T>();
         }
+
+        private protected async Task<T?> SendAsync<T, R>(string url, HttpMethod method, R data)
+        {
+            var response = await SendAsync(url, method, data);
+
+            return await response.Content.ReadFromJsonAsync<T>();
+        }
     }
 }

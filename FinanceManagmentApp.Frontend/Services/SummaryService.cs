@@ -11,18 +11,14 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task<SummaryDTO> GetDateRangeSummary(DateRangeDTO dateRange)
         {
-            var response = await SendAsync("api/Summary/dateRangeSummary/", HttpMethod.Post, dateRange);
-
-            var summary = await response.Content.ReadFromJsonAsync<SummaryDTO>();
+            var summary = await SendAsync<SummaryDTO, DateRangeDTO>("api/Summary/dateRangeSummary/", HttpMethod.Post, dateRange);
 
             return summary ?? throw new InvalidDataException("Failed to get summary from server response.");
         }
 
         public async Task<SummaryDTO> GetDaySummary(DateOnly dateOnly)
         {
-            var response = await SendAsync("api/Summary/daySummary/", HttpMethod.Post, dateOnly);
-
-            var summary = await response.Content.ReadFromJsonAsync<SummaryDTO>();
+            var summary = await SendAsync<SummaryDTO, DateOnly>("api/Summary/daySummary/", HttpMethod.Post, dateOnly);
 
             return summary ?? throw new InvalidDataException("Failed to get summary from server response.");
         }

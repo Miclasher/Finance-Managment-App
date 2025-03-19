@@ -25,18 +25,14 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task<IEnumerable<FinancialOperationDTO>> GetAllAsync()
         {
-            var response = await SendAsync("api/FinancialOperation", HttpMethod.Get);
-
-            var financialOperations = await response.Content.ReadFromJsonAsync<List<FinancialOperationDTO>>();
+            var financialOperations = await SendAsync<List<FinancialOperationDTO>>("api/FinancialOperation", HttpMethod.Get);
 
             return financialOperations ?? throw new InvalidDataException("Failed to get financial operations from server response.");
         }
 
         public async Task<FinancialOperationDTO> GetByIdAsync(Guid id)
         {
-            var response = await SendAsync($"api/FinancialOperation/{id}", HttpMethod.Get);
-
-            var financialOperation = await response.Content.ReadFromJsonAsync<FinancialOperationDTO>();
+            var financialOperation = await SendAsync<FinancialOperationDTO>($"api/FinancialOperation/{id}", HttpMethod.Get);
 
             return financialOperation ?? throw new InvalidDataException("Failed to get financial operation from server response.");
         }

@@ -24,18 +24,14 @@ namespace FinanceManagmentApp.Frontend.Services
 
         public async Task<IEnumerable<TransactionTypeDTO>> GetAllAsync()
         {
-            var response = await SendAsync("api/TransactionType", HttpMethod.Get);
-
-            var transactionTypes = await response.Content.ReadFromJsonAsync<List<TransactionTypeDTO>>();
+            var transactionTypes = await SendAsync<List<TransactionTypeDTO>>("api/TransactionType", HttpMethod.Get);
 
             return transactionTypes ?? throw new InvalidDataException("Failed to get transaction types from server response.");
         }
 
         public async Task<TransactionTypeDTO> GetByIdAsync(Guid id)
         {
-            var response = await SendAsync($"api/TransactionType/{id}", HttpMethod.Get);
-
-            var transactionType = await response.Content.ReadFromJsonAsync<TransactionTypeDTO>();
+            var transactionType = await SendAsync<TransactionTypeDTO>($"api/TransactionType/{id}", HttpMethod.Get);
 
             return transactionType ?? throw new InvalidDataException("Failed to get transaction type from server response.");
         }

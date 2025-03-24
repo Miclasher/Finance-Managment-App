@@ -1,0 +1,54 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<h3>Register</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+<EditForm class="container" model="UserRegisterDTO" OnValidSubmit="HandleRegistration">
+    <DataAnnotationsValidator />
+    <div class="m-3">
+        <label class="form-label" for="displayName">Display Name</label>
+        <InputText class="form-control" id="displayName" @bind-Value="UserRegisterDTO.DisplayName" />
+        <ValidationMessage For="@(() => UserRegisterDTO.DisplayName)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="username">Username</label>
+        <InputText class="form-control" id="username" @bind-Value="UserRegisterDTO.Username" />
+        <ValidationMessage For="@(() => UserRegisterDTO.Username)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="password">Password</label>
+        <InputText class="form-control" id="password" type="password" @bind-Value="UserRegisterDTO.PlainPassword" />
+        <ValidationMessage For="@(() => UserRegisterDTO.PlainPassword)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="email">Email</label>
+        <InputText class="form-control" id="email" @bind-Value="UserRegisterDTO.Email" />
+        <ValidationMessage For="@(() => UserRegisterDTO.Email)" />
+    </div>
+    <button class="btn btn-primary m-3" type="submit">Register</button>
+</EditForm>
+
+@code {
+    private UserRegisterDTO UserRegisterDTO { get; set; } = new UserRegisterDTO();
+    private string? ErrorMessage { get; set; } = null;
+
+    private async Task HandleRegistration()
+    {
+        try
+        {
+            await AuthService.RegisterAsync(UserRegisterDTO);
+            NavigationManager.NavigateTo("/");
+        }
+        catch(Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

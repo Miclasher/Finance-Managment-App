@@ -34,5 +34,10 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         {
             return (await _dbSet.AsNoTracking().Include(e => e.TransactionType).Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;
         }
+
+        public async Task<FinancialOperation> GetByIdWithoutTransactionType(Guid id, CancellationToken cancellationToken = default)
+        {
+            return (await _dbSet.AsNoTracking().Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;
+        }
     }
 }

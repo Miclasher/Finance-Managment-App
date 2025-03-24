@@ -1,0 +1,103 @@
+﻿@page "/transactionTypes"
+@rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
+@inject NavigationManager NavigationManager
+
+<div class="hstack">
+    <h3>Transaction Types</h3>
+    <button class="btn btn-primary m-3" @onclick="CreateTransactionType">Create</button>
+</div>
+
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+@if (TransactionTypes is null)
+{
+    <p>Loading...</p>
+}
+else if (!TransactionTypes.Any())
+{
+    <p>No transaction types found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Is Expense</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transactionType in TransactionTypes)
+            {
+                <tr>
+                    <td>@transactionType.Name</td>
+                    <td>
+                        @if (transactionType.IsExpense)
+                        {
+                            <p>Yes</p>
+                        }
+                        else
+                        {
+                            <p>No</p>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteTransactionType(transactionType.Id)">Delete</button>
+                        <button class="btn btn-primary" @onclick="() => EditTransactionType(transactionType.Id)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                TransactionTypes = await TransactionTypeService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+    }
+
+    private async Task DeleteTransactionType(Guid id)
+    {
+        try
+        {
+            await TransactionTypeService.DeleteAsync(id);
+            TransactionTypes = await TransactionTypeService.GetAllAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+
+    private void EditTransactionType(Guid id)
+    {
+        NavigationManager.NavigateTo($"/transactionTypes/edit/{id}");
+    }
+
+    private void CreateTransactionType()
+    {
+        NavigationManager.NavigateTo("/transactionTypes/create");
+    }
+}

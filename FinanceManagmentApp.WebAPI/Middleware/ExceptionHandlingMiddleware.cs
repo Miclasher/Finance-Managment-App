@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using FinanceManagmentApp.Shared;
+using System.Text.Json;
 
 namespace FinanceManagmentApp.WebAPI.Middleware
 {
@@ -29,9 +30,9 @@ namespace FinanceManagmentApp.WebAPI.Middleware
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var response = new
+            var response = new ErrorDTO
             {
-                error = exception.Message
+                Error = exception.Message
             };
 
             await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));

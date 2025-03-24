@@ -1,0 +1,108 @@
+﻿@page "/dateRangeSummary"
+@rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
+@inject ISummaryService SummaryService
+<h3>Date Range Summary</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+<div class="container">
+    <h5>Enter a date range to get summary for it:</h5>
+    <EditForm Model="DateRange" OnValidSubmit="GetDateRangeSummary">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="m-3">
+            <label for="StartDate">Start Date:</label>
+            <InputDate id="StartDate" @bind-Value="DateRange.StartDate" />
+        </div>
+        <div class="m-3">
+            <label for="EndDate">End Date:</label>
+            <InputDate id="EndDate" @bind-Value="DateRange.EndDate" />
+        </div>
+        <button type="submit" class="btn btn-primary m-3">Get Date Range Summary</button>
+    </EditForm>
+</div>
+
+@if (Summary is not null)
+{
+    <div class="container">
+        <dl>
+            <div class="m-3">
+                <dt>Income</dt>
+                <dd class="text-success">@Summary.TotalIncome</dd>
+            </div>
+            <div class="m-3">
+                <dt>Expenses</dt>
+                <dd class="text-danger">@(Summary.TotalExpense * -1)</dd>
+            </div>
+        </dl>
+        <table class="table m-3">
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                    <th>Transaction Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var financialOperation in Summary.Operations)
+                {
+                    var transactionType = TransactionTypes.First(tt => tt.Id == financialOperation.TransactionTypeId);
+                    <tr>
+
+                        <td>
+                            @if (transactionType.IsExpense)
+                            {
+                                <p class="text-danger">-@financialOperation.Amount</p>
+                            }
+                            else
+                            {
+                                <p class="text-success">@financialOperation.Amount</p>
+                            }
+                        </td>
+                        <td>@financialOperation.Date</td>
+                        <td>@financialOperation.UserComment</td>
+                        <td>@transactionType.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private DateRangeDTO DateRange { get; set; } = new DateRangeDTO
+        {
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            EndDate = DateOnly.FromDateTime(DateTime.UtcNow)
+        };
+    private SummaryDTO Summary { get; set; } = null!;
+    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
+    private string? ErrorMessage { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            TransactionTypes = await TransactionTypeService.GetAllAsync();
+        }
+    }
+
+    private async Task GetDateRangeSummary()
+    {
+        try
+        {
+            Summary = await SummaryService.GetDateRangeSummary(DateRange);
+            ErrorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            Summary = null!;
+            ErrorMessage = ex.Message;
+        }
+    }
+}

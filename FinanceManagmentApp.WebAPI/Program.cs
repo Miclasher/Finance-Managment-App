@@ -22,7 +22,7 @@ namespace FinanceManagmentApp.WebAPI
 
             // Add services to the container.
             builder.Services.AddDbContext<FinanceManagmentAppContext>(options
-                => options.UseSqlServer(builder.Configuration["DbConnectionString"]));
+                => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 

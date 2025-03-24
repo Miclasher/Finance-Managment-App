@@ -1,0 +1,43 @@
+﻿@page "/transactionTypes/create"
+@rendermode InteractiveServer
+@inject ITransactionTypeService TransactionTypeService
+@inject NavigationManager NavigationManager
+<h3>Create</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+
+<EditForm model="TransactionTypeForCreateDTO" class="container" OnValidSubmit="HandleCreate">
+    <DataAnnotationsValidator />
+    <div class="m-3">
+        <label class="form-label" for="name">Name: </label>
+        <InputText class="form-control" id="name" @bind-Value="TransactionTypeForCreateDTO.Name" />
+        <ValidationMessage For="@(() => TransactionTypeForCreateDTO.Name)" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="isExpense">Is Expense: </label>
+        <InputCheckbox class="form-check-input" id="isExpense" @bind-Value="TransactionTypeForCreateDTO.IsExpense" />
+        <ValidationMessage For="@(() => TransactionTypeForCreateDTO.IsExpense)" />
+    </div>
+    <button class="btn btn-primary m-3" type="submit">Save</button>
+</EditForm>
+
+@code {
+    private TransactionTypeForCreateDTO TransactionTypeForCreateDTO { get; set; } = new TransactionTypeForCreateDTO();
+    private string? ErrorMessage { get; set; } = null;
+
+    private async Task HandleCreate()
+    {
+        try
+        {
+            await TransactionTypeService.CreateAsync(TransactionTypeForCreateDTO);
+            NavigationManager.NavigateTo("/transactionTypes");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

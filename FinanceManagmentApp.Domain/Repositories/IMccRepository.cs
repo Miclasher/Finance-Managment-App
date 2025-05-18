@@ -2,7 +2,5 @@
 
 namespace FinanceManagmentApp.Domain.Repositories
 {
-    public interface IMccRepository : IRepository<Mcc>
-    {
-    }
+    public interface IMccRepository : IRepository<Mcc>;
 }

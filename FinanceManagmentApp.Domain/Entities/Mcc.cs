@@ -6,6 +6,6 @@
         public int Value { get; set; }
 
         public IEnumerable<TransactionType> TransactionTypes = new List<TransactionType>();
-        public IEnumerable<TransactionTypeTemplate> TransactionTypeTemplates = new List<TransactionTypeTemplate>()
+        public IEnumerable<TransactionTypeTemplate> TransactionTypeTemplates = new List<TransactionTypeTemplate>();
     }
 }

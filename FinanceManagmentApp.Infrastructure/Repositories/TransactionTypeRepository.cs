@@ -19,5 +19,13 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         {
             return await _dbSet.AsNoTracking().Where(e => e.UserId == userId).ToListAsync(cancellationToken);
         }
+
+        public async Task<Dictionary<int, Guid>> GetMccToTransactionTypeIdDict(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.AsNoTracking()
+                .Where(e => e.UserId == userId)
+                .SelectMany(tt => tt.Mccs.Select(mccs => new { mccs.Value, tt.Id }))
+                .ToDictionaryAsync(e => e.Value, e => e.Id, cancellationToken);
+        }
     }
 }

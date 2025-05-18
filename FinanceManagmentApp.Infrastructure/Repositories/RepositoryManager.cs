@@ -9,6 +9,8 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         private readonly Lazy<IFinancialOperationRepository> _lazyFinancialOperationRepository;
         private readonly Lazy<IUserRepository> _lazyUserRepository;
         private readonly Lazy<IJwtRefreshTokenRepository> _lazyRefreshTokenRepository;
+        private readonly Lazy<ITransactionTypeTemplateRepository> _lazyTransactionTypeTemplateRepository;
+        private readonly Lazy<IMccRepository> _lazyMccRepository;
         private readonly Lazy<IUnitOfWork> _lazyUnitOfWork;
 
         public RepositoryManager(FinanceManagmentAppContext context)
@@ -18,6 +20,8 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             _lazyFinancialOperationRepository = new Lazy<IFinancialOperationRepository>(() => new FinancialOperationRepository(context));
             _lazyUserRepository = new Lazy<IUserRepository>(() => new UserRepository(context));
             _lazyRefreshTokenRepository = new Lazy<IJwtRefreshTokenRepository>(() => new JwtRefreshTokenRepository(context));
+            _lazyTransactionTypeTemplateRepository = new Lazy<ITransactionTypeTemplateRepository>(() => new TransactionTypeRepositoryTemplate(context));
+            _lazyMccRepository = new Lazy<IMccRepository>(() => new MccRepository(context));
             _lazyUnitOfWork = new Lazy<IUnitOfWork>(() => new UnitOfWork(context));
         }
 
@@ -28,6 +32,8 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         public IUserRepository User => _lazyUserRepository.Value;
 
         public IJwtRefreshTokenRepository RefreshToken => _lazyRefreshTokenRepository.Value;
+        public IMccRepository Mcc => _lazyMccRepository.Value;
+        public ITransactionTypeTemplateRepository TransactionTypeTemplate => _lazyTransactionTypeTemplateRepository.Value;
 
         public IUnitOfWork UnitOfWork => _lazyUnitOfWork.Value;
     }

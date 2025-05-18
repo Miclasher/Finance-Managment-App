@@ -22,7 +22,7 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
             {
                 return mccToTransactionType[mcc];
             }
-            catch(KeyNotFoundException)
+            catch (KeyNotFoundException)
             {
                 return mccToTransactionType[-1];
             }

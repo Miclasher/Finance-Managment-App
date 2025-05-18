@@ -22,7 +22,7 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
             var financialOperations = new List<FinancialOperation>();
             var transactions = await GetTransactions(url);
 
-            if(transactions is not null)
+            if (transactions is not null)
             {
                 financialOperations.AddRange(transactions.Select(e => e.ToFinancialOperation(mccToTransactionTypeId, userId)));
             }

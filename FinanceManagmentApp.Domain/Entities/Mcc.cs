@@ -1,0 +1,11 @@
+﻿namespace FinanceManagmentApp.Domain.Entities
+{
+    public sealed class Mcc
+    {
+        public Guid Id { get; set; }
+        public int Value { get; set; }
+
+        public IEnumerable<TransactionType> TransactionTypes = new List<TransactionType>();
+        public IEnumerable<TransactionTypeTemplate> TransactionTypeTemplates = new List<TransactionTypeTemplate>()
+    }
+}

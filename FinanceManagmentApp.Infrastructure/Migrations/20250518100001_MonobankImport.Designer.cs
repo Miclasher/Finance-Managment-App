@@ -4,6 +4,7 @@ using FinanceManagmentApp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceManagmentApp.Infrastructure.Migrations
 {
     [DbContext(typeof(FinanceManagmentAppContext))]
-    partial class FinanceManagmentAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250518100001_MonobankImport")]
+    partial class MonobankImport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,12 +92,17 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TransactionTypeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Mccs");
+                    b.HasIndex("TransactionTypeId");
+
+                    b.ToTable("Mcc");
                 });
 
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
@@ -119,25 +127,6 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TransactionTypes");
-                });
-
-            modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionTypeTemplate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsExpense")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransactionTypeTemplates");
                 });
 
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.User", b =>
@@ -178,36 +167,6 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MccTransactionType", b =>
-                {
-                    b.Property<Guid>("MccsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TransactionTypesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("MccsId", "TransactionTypesId");
-
-                    b.HasIndex("TransactionTypesId");
-
-                    b.ToTable("MccTransactionType");
-                });
-
-            modelBuilder.Entity("MccTransactionTypeTemplate", b =>
-                {
-                    b.Property<Guid>("MccsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TransactionTypeTemplatesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("MccsId", "TransactionTypeTemplatesId");
-
-                    b.HasIndex("TransactionTypeTemplatesId");
-
-                    b.ToTable("MccTransactionTypeTemplate");
-                });
-
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.FinancialOperation", b =>
                 {
                     b.HasOne("FinanceManagmentApp.Domain.Entities.TransactionType", "TransactionType")
@@ -238,6 +197,13 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.Mcc", b =>
+                {
+                    b.HasOne("FinanceManagmentApp.Domain.Entities.TransactionType", null)
+                        .WithMany("Mccs")
+                        .HasForeignKey("TransactionTypeId");
+                });
+
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
                 {
                     b.HasOne("FinanceManagmentApp.Domain.Entities.User", "User")
@@ -249,39 +215,11 @@ namespace FinanceManagmentApp.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MccTransactionType", b =>
-                {
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.Mcc", null)
-                        .WithMany()
-                        .HasForeignKey("MccsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.TransactionType", null)
-                        .WithMany()
-                        .HasForeignKey("TransactionTypesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MccTransactionTypeTemplate", b =>
-                {
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.Mcc", null)
-                        .WithMany()
-                        .HasForeignKey("MccsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinanceManagmentApp.Domain.Entities.TransactionTypeTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("TransactionTypeTemplatesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.TransactionType", b =>
                 {
                     b.Navigation("FinancialOperations");
+
+                    b.Navigation("Mccs");
                 });
 
             modelBuilder.Entity("FinanceManagmentApp.Domain.Entities.User", b =>

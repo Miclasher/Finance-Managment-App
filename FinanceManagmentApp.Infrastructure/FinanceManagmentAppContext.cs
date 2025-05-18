@@ -9,7 +9,8 @@ namespace FinanceManagmentApp.Infrastructure
         public DbSet<JwtRefreshToken> RefreshTokens { get; set; }
         public DbSet<FinancialOperation> FinancialOperations { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
-
+        public DbSet<TransactionTypeTemplate> TransactionTypeTemplates { get; set; }
+        public DbSet<Mcc> Mccs { get; set; }
         public FinanceManagmentAppContext(DbContextOptions<FinanceManagmentAppContext> options) : base(options)
         {
         }

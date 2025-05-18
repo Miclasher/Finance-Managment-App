@@ -62,6 +62,8 @@ namespace FinanceManagmentApp.Services
 
             await _repositoryManager.RefreshToken.ReplaceUserTokenAsync(userToAdd.Id, refreshToken, cancellationToken);
 
+            await AddDefaultTransactionTypes(userToAdd.Id, cancellationToken);
+
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             return new AuthResponseDTO
@@ -121,6 +123,25 @@ namespace FinanceManagmentApp.Services
                 CreatedAt = DateTime.UtcNow,
                 UserId = userId
             };
+        }
+
+        private async Task AddDefaultTransactionTypes(Guid userId, CancellationToken cancellationToken = default)
+        {
+            var templates = await _repositoryManager.TransactionTypeTemplate.GetAllWithMccAsync(cancellationToken)
+                ?? throw new InvalidDataException("Cannot find transaction type templates.");
+
+            foreach(var template in templates)
+            {
+                var newTransactionType = new TransactionType
+                {
+                    UserId = userId,
+                    Name = template.Name,
+                    IsExpense = template.IsExpense,
+                    Mccs = template.Mccs.ToList()
+                };
+
+                await _repositoryManager.TransactionType.AddAsync(newTransactionType, cancellationToken);
+            }
         }
     }
 }

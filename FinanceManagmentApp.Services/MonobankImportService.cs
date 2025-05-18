@@ -36,7 +36,10 @@ namespace FinanceManagmentApp.Services
             var finOps
                 = await _monobankClient.FetchFinancialOperationsAsync(user.MonobankAccountId, from, to, userId, mccToTransactionTypeIdDict)
                 ?? throw new InvalidDataException("Financial operations cannot be null.");
+
             await _repositoryManager.FinancialOperation.AddRangeAsync(finOps, cancellationToken);
+
+            await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             return SummaryService.GenerateSummary(finOps);
         }

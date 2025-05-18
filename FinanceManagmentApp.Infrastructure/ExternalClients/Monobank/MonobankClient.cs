@@ -13,7 +13,7 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<IEnumerable<FinancialOperation>> FetchFinancialOperations(string accountId, DateTime from, DateTime to, Guid userId, Dictionary<int, Guid> mccToTransactionTypeId)
+        public async Task<IEnumerable<FinancialOperation>> FetchFinancialOperationsAsync(string accountId, DateTime from, DateTime to, Guid userId, Dictionary<int, Guid> mccToTransactionTypeId)
         {
             var fromUnix = ((DateTimeOffset)from).ToUnixTimeSeconds();
             var toUnix = ((DateTimeOffset)to).ToUnixTimeSeconds();

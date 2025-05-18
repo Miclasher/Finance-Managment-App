@@ -4,6 +4,6 @@ namespace FinanceManagmentApp.Services.Abstractions
 {
     public interface IMonobankImportService
     {
-        Task<IEnumerable<FinancialOperationDTO>> ImportFinancialOperations(Guid userId, DateTime from, DateTime to, CancellationToken cancellationToken = default);
+        Task<SummaryDTO> ImportFinancialOperations(Guid userId, DateTime from, DateTime to, CancellationToken cancellationToken = default);
     }
 }

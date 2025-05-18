@@ -20,7 +20,7 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             return await _dbSet.AsNoTracking().Where(e => e.UserId == userId).ToListAsync(cancellationToken);
         }
 
-        public async Task<Dictionary<int, Guid>> GetMccToTransactionTypeIdDict(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<Dictionary<int, Guid>> GetMccToTransactionTypeIdDictAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _dbSet.AsNoTracking()
                 .Where(e => e.UserId == userId)

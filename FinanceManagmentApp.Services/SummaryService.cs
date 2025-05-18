@@ -38,7 +38,7 @@ namespace FinanceManagmentApp.Services
             return GenerateSummary(financialOperations);
         }
 
-        private static SummaryDTO GenerateSummary(IEnumerable<FinancialOperation> financialOperations)
+        internal static SummaryDTO GenerateSummary(IEnumerable<FinancialOperation> financialOperations)
         {
             var totalIncome = 0m;
             var totalExpense = 0m;

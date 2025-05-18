@@ -22,6 +22,10 @@ namespace FinanceManagmentApp.WebAPI
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddUserSecrets(typeof(Program).Assembly).Build();
 
+            builder.Services.AddHttpClient("MonobankAPI",
+                (sp, client)
+                => client.BaseAddress = new Uri("https://api.monobank.ua/"));
+
             // Add services to the container.
             builder.Services.AddDbContext<FinanceManagmentAppContext>(options
                 => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

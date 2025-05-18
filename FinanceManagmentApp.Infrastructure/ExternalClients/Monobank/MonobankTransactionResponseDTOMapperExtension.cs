@@ -9,22 +9,30 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
             return new FinancialOperation()
             {
                 Id = Guid.NewGuid(),
-                Amount = monobankTransaction.Amount,
+                Amount = Math.Abs(monobankTransaction.Amount) / 100m,
                 UserComment = MergeDescription(monobankTransaction),
-                TransactionTypeId = ConvertMccToTransactionTypeId(monobankTransaction.Mcc, mccToTransactionType),
+                TransactionTypeId = ConvertMccToTransactionTypeId(monobankTransaction, mccToTransactionType),
+                Date = DateTimeOffset.FromUnixTimeSeconds(monobankTransaction.Time).DateTime,
                 UserId = userId
             };
         }
 
-        private static Guid ConvertMccToTransactionTypeId(int mcc, Dictionary<int, Guid> mccToTransactionType)
+        private static Guid ConvertMccToTransactionTypeId(MonobankTransactionResponseDTO monobankTransaction, Dictionary<int, Guid> mccToTransactionType)
         {
-            try
-            {
-                return mccToTransactionType[mcc];
-            }
-            catch (KeyNotFoundException)
+            if (monobankTransaction.Amount > 0)
             {
                 return mccToTransactionType[-1];
+            }
+            else
+            {
+                try
+                {
+                    return mccToTransactionType[monobankTransaction.Mcc];
+                }
+                catch (KeyNotFoundException)
+                {
+                    return mccToTransactionType[-2];
+                }
             }
         }
 

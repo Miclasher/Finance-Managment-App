@@ -108,7 +108,8 @@ namespace FinanceManagmentApp.Services
                 PasswordHash = hashedPassword,
                 Salt = Convert.ToBase64String(saltBytes),
                 Email = newUser.Email,
-                DisplayName = newUser.DisplayName
+                DisplayName = newUser.DisplayName,
+                MonobankAccountId = newUser.MonobankAccountId
             };
             return userToAdd;
         }

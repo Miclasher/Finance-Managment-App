@@ -1,5 +1,7 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.ExternalClients.Abstractions;
+using Microsoft.Identity.Client;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
@@ -8,19 +10,22 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
     {
         private readonly HttpClient _httpClient;
 
-        public MonobankClient(HttpClient httpClient)
+        public MonobankClient(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            ArgumentNullException.ThrowIfNull(httpClientFactory);
+
+            _httpClient = httpClientFactory.CreateClient("MonobankAPI");
         }
 
-        public async Task<IEnumerable<FinancialOperation>> FetchFinancialOperationsAsync(string accountId, DateTime from, DateTime to, Guid userId, Dictionary<int, Guid> mccToTransactionTypeId)
+        public async Task<IEnumerable<FinancialOperation>> FetchFinancialOperationsAsync(string monobankAPIToken, DateTime from, DateTime to, Guid userId, Dictionary<int, Guid> mccToTransactionTypeId)
         {
             var fromUnix = ((DateTimeOffset)from).ToUnixTimeSeconds();
             var toUnix = ((DateTimeOffset)to).ToUnixTimeSeconds();
-            string url = $"https://api.monobank.ua/personal/statement/{accountId}/{fromUnix}/{toUnix}";
+            string uri = $"/personal/statement/0/{fromUnix}/{toUnix}";
+            _httpClient.DefaultRequestHeaders.Add("X-Token", monobankAPIToken);
 
             var financialOperations = new List<FinancialOperation>();
-            var transactions = await GetTransactions(url);
+            var transactions = await GetTransactions(uri);
 
             if (transactions is not null)
             {
@@ -30,9 +35,9 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
             return financialOperations;
         }
 
-        private async Task<IEnumerable<MonobankTransactionResponseDTO>?> GetTransactions(string url)
+        private async Task<IEnumerable<MonobankTransactionResponseDTO>?> GetTransactions(string uri)
         {
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(uri);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<IEnumerable<MonobankTransactionResponseDTO>>();

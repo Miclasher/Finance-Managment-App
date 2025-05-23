@@ -131,7 +131,7 @@ namespace FinanceManagmentApp.Services
             var templates = await _repositoryManager.TransactionTypeTemplate.GetAllWithMccAsync(cancellationToken)
                 ?? throw new InvalidDataException("Cannot find transaction type templates.");
 
-            foreach(var template in templates)
+            foreach (var template in templates)
             {
                 var newTransactionType = new TransactionType
                 {

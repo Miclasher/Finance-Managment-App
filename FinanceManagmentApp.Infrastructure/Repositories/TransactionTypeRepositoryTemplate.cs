@@ -1,7 +1,6 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace FinanceManagmentApp.Infrastructure.Repositories
 {

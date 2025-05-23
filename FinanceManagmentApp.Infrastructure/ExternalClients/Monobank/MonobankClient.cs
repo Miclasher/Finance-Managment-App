@@ -1,7 +1,5 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.ExternalClients.Abstractions;
-using Microsoft.Identity.Client;
-using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank

@@ -2,7 +2,6 @@
 using FinanceManagmentApp.Shared;
 using FinanceManagmentApp.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManagmentApp.WebAPI.Controllers

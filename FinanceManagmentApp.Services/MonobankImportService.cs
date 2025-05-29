@@ -38,10 +38,24 @@ namespace FinanceManagmentApp.Services
                 ?? throw new InvalidDataException("Financial operations cannot be null.");
 
             await _repositoryManager.FinancialOperation.AddRangeAsync(finOps, cancellationToken);
-
             await _repositoryManager.UnitOfWork.SaveChangesAsync(cancellationToken);
 
+            finOps = await IncludeTransactionTypeObjects(userId, finOps, cancellationToken);
+
             return SummaryService.GenerateSummary(finOps);
+        }
+
+        private async Task<IEnumerable<Domain.Entities.FinancialOperation>> IncludeTransactionTypeObjects(Guid userId, IEnumerable<Domain.Entities.FinancialOperation> finOps, CancellationToken cancellationToken)
+        {
+            var transactionTypeIds = finOps.Select(e => e.TransactionTypeId).Distinct().ToList();
+            var transactionTypesDict = await _repositoryManager.TransactionType.GetDictByIdListAsync(userId, transactionTypeIds, cancellationToken);
+
+            finOps = finOps.Select(selector: e =>
+            {
+                e.TransactionType = transactionTypesDict[e.TransactionTypeId];
+                return e;
+            });
+            return finOps;
         }
     }
 }

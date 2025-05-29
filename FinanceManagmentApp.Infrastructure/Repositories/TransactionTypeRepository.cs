@@ -27,5 +27,13 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
                 .SelectMany(tt => tt.Mccs.Select(mccs => new { mccs.Value, tt.Id }))
                 .ToDictionaryAsync(e => e.Value, e => e.Id, cancellationToken);
         }
+
+        public async Task<Dictionary<Guid, TransactionType>> GetDictByIdListAsync(Guid userId, IEnumerable<Guid> transactionTypeIds, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.AsNoTracking()
+                .Where(e => e.UserId == userId)
+                .Where(e => transactionTypeIds.Contains(e.Id))
+                .ToDictionaryAsync(e => e.Id, cancellationToken);
+        }
     }
 }

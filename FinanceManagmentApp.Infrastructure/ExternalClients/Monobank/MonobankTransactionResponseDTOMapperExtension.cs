@@ -45,7 +45,7 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
 
         private static Guid ConvertRecieptIdToGuid(MonobankTransactionResponseDTO monobankTransaction)
         {
-            var bytes = MD5.HashData(Encoding.UTF8.GetBytes(monobankTransaction.ReceiptId));
+            var bytes = MD5.HashData(Encoding.UTF8.GetBytes(monobankTransaction.ReceiptId + monobankTransaction.Time));
 
             return new Guid(bytes);
         }

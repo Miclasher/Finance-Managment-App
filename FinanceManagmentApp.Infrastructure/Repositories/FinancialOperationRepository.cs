@@ -33,7 +33,6 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
         public async Task<HashSet<Guid>> GetAllIdsByUserAndDateRangeAsync(Guid userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
         {
             var ids = await _dbSet
-                .AsNoTracking()
                 .Include(e => e.TransactionType)
                 .Where(e => e.UserId == userId
                 && DateOnly.FromDateTime(e.Date) >= from

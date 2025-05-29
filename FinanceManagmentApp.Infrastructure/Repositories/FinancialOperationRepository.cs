@@ -30,6 +30,20 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             return await _dbSet.AsNoTracking().Where(e => e.UserId == userId).ToListAsync(cancellationToken);
         }
 
+        public async Task<HashSet<Guid>> GetAllIdsByUserAndDateRangeAsync(Guid userId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+        {
+            var ids = await _dbSet
+                .AsNoTracking()
+                .Include(e => e.TransactionType)
+                .Where(e => e.UserId == userId
+                && DateOnly.FromDateTime(e.Date) >= from
+                && DateOnly.FromDateTime(e.Date) <= to)
+                .Select(e => e.Id)
+                .ToListAsync(cancellationToken);
+
+            return ids.ToHashSet();
+        }
+
         public override async Task<FinancialOperation> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return (await _dbSet.AsNoTracking().Include(e => e.TransactionType).Where(e => e.Id == id).FirstOrDefaultAsync(cancellationToken))!;

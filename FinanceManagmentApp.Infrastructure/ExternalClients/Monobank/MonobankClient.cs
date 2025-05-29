@@ -19,6 +19,13 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
         {
             var fromUnix = ((DateTimeOffset)from).ToUnixTimeSeconds();
             var toUnix = ((DateTimeOffset)to).ToUnixTimeSeconds();
+
+            // Monobank will respond with code 400 if the time frame is greater than 31 days + 1 hour (2,682,000 seconds)
+            if (toUnix - fromUnix >= 2682000)
+            {
+                throw new ArgumentException("Time frame for transaction import shouldn't be longer than a month.");
+            }
+
             string uri = $"/personal/statement/0/{fromUnix}/{toUnix}";
             _httpClient.DefaultRequestHeaders.Add("X-Token", monobankAPIToken);
 

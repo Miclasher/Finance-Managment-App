@@ -1,4 +1,6 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
 {
@@ -8,7 +10,7 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
         {
             return new FinancialOperation()
             {
-                Id = Guid.NewGuid(),
+                Id = ConvertRecieptIdToGuid(monobankTransaction),
                 Amount = Math.Abs(monobankTransaction.Amount) / 100m,
                 UserComment = MergeDescription(monobankTransaction),
                 TransactionTypeId = ConvertMccToTransactionTypeId(monobankTransaction, mccToTransactionType),
@@ -39,6 +41,14 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
         private static string MergeDescription(MonobankTransactionResponseDTO monobankTransaction)
         {
             return $"{monobankTransaction.Comment} - {monobankTransaction.Description} - {monobankTransaction.CounterName}";
+        }
+
+        private static Guid ConvertRecieptIdToGuid(MonobankTransactionResponseDTO monobankTransaction)
+        {
+            using var md5 = MD5.Create();
+            var bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(monobankTransaction.ReceiptId));
+
+            return new Guid(bytes);
         }
     }
 }

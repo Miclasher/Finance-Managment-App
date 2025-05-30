@@ -109,7 +109,7 @@ namespace FinanceManagmentApp.Services
                 Salt = Convert.ToBase64String(saltBytes),
                 Email = newUser.Email,
                 DisplayName = newUser.DisplayName,
-                MonobankAccountId = newUser.MonobankAccountId
+                MonobankAccountId = newUser.MonobankApiToken
             };
             return userToAdd;
         }

@@ -32,6 +32,11 @@
         <InputText class="form-control" id="email" @bind-Value="UserRegisterDTO.Email" />
         <ValidationMessage For="@(() => UserRegisterDTO.Email)" />
     </div>
+    <div class="m-3">
+        <label class="form-label" for="monobankApiToken">Monobank API token</label>
+        <InputText class="form-control" id="monobankApiToken" @bind-Value="UserRegisterDTO.MonobankApiToken" />
+        <ValidationMessage For="@(() => UserRegisterDTO.MonobankApiToken)"/>
+    </div>
     <button class="btn btn-primary m-3" type="submit">Register</button>
 </EditForm>
 

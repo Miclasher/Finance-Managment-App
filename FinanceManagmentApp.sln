@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagmentApp.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagmentApp.WebAPI", "FinanceManagmentApp.WebAPI\FinanceManagmentApp.WebAPI.csproj", "{902516EE-6186-4E85-AAC8-51F9C45335CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagmentApp.Frontend", "FinanceManagmentApp.Frontend\FinanceManagmentApp.Frontend.csproj", "{45A179BD-5D09-4276-96B5-06423CA5857F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagmentApp.Frontend", "FinanceManagmentApp.Frontend\FinanceManagmentApp.Frontend.csproj", "{45A179BD-5D09-4276-96B5-06423CA5857F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagmentApp.ExternalClients.Abstractions", "FinanceManagmentApp.ExternalClients.Abstractions\FinanceManagmentApp.ExternalClients.Abstractions.csproj", "{E4596A4F-0AE5-467B-AD81-E491B6693DC7}"
 EndProject

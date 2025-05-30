@@ -16,6 +16,6 @@ namespace FinanceManagmentApp.Shared
         [MaxLength(150)]
         public string DisplayName { get; set; } = string.Empty;
         [Required]
-        public string MonobankAccountId { get; set; } = string.Empty;
+        public string MonobankApiToken { get; set; } = string.Empty;
     }
 }

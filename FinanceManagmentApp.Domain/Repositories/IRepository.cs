@@ -9,6 +9,7 @@ namespace FinanceManagmentApp.Domain.Repositories
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
         void Update(T entity, CancellationToken cancellationToken = default);
         void Remove(T entity, CancellationToken cancellationToken = default);
         void RemoveRange(IEnumerable<T> entities, CancellationToken cancellationToken = default);

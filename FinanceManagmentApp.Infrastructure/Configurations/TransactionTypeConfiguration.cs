@@ -25,6 +25,9 @@ namespace FinanceManagmentApp.Infrastructure.Configurations
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasMany(e => e.Mccs)
+                .WithMany(e => e.TransactionTypes);
+
             builder.HasMany(e => e.FinancialOperations)
                 .WithOne(e => e.TransactionType)
                 .HasForeignKey(e => e.TransactionTypeId);

@@ -1,5 +1,7 @@
 using FinanceManagmentApp.Domain.Repositories;
+using FinanceManagmentApp.ExternalClients.Abstractions;
 using FinanceManagmentApp.Infrastructure;
+using FinanceManagmentApp.Infrastructure.ExternalClients.Monobank;
 using FinanceManagmentApp.Infrastructure.Repositories;
 using FinanceManagmentApp.Services;
 using FinanceManagmentApp.Services.Abstractions;
@@ -20,6 +22,10 @@ namespace FinanceManagmentApp.WebAPI
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddUserSecrets(typeof(Program).Assembly).Build();
 
+            builder.Services.AddHttpClient("MonobankAPI",
+                (sp, client)
+                => client.BaseAddress = new Uri("https://api.monobank.ua/"));
+
             // Add services to the container.
             builder.Services.AddDbContext<FinanceManagmentAppContext>(options
                 => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -27,12 +33,14 @@ namespace FinanceManagmentApp.WebAPI
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
             builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+            builder.Services.AddScoped<IMonobankClient, MonobankClient>();
 
             builder.Services.AddScoped<IJwtUtility, JwtUtility>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();
             builder.Services.AddScoped<IFinancialOperationService, FinancialOperationService>();
+            builder.Services.AddScoped<IMonobankImportService, MonobankImportService>();
             builder.Services.AddScoped<ISummaryService, SummaryService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,7 +59,6 @@ namespace FinanceManagmentApp.WebAPI
                 });
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(o =>
             {
@@ -91,7 +98,6 @@ namespace FinanceManagmentApp.WebAPI
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

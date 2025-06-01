@@ -43,6 +43,10 @@ namespace FinanceManagmentApp.Services
             {
                 throw new InvalidOperationException($"Cannot delete transaction type with id {targetId} because it has associated financial operations.");
             }
+            if (target.Mccs.Any())
+            {
+                throw new InvalidOperationException($"Cannot delete transaction type with id {targetId} because it was automatically generated and has MCCs linked to it.");
+            }
 
             _repositoryManager.TransactionType.Remove(target, cancellationToken);
 

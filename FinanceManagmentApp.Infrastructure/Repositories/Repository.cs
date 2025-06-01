@@ -24,6 +24,13 @@ namespace FinanceManagmentApp.Infrastructure.Repositories
             await _dbSet.AddAsync(entity, cancellationToken);
         }
 
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(entities);
+
+            await _dbSet.AddRangeAsync(entities, cancellationToken);
+        }
+
         public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(predicate);

@@ -52,7 +52,7 @@
             <tbody>
                 @foreach (var financialOperation in Summary.Operations)
                 {
-                    var transactionType = TransactionTypes.First(tt => tt.Id == financialOperation.TransactionTypeId);
+                    var transactionType = IdToTransactionTypeDictionary[financialOperation.TransactionTypeId];
                     <tr>
 
                         <td>
@@ -83,13 +83,14 @@
         EndDate = DateOnly.FromDateTime(DateTime.UtcNow)
     };
     private SummaryDTO Summary { get; set; } = null!;
-    private IEnumerable<TransactionTypeDTO> TransactionTypes { get; set; } = new List<TransactionTypeDTO>();
+    private Dictionary<Guid, TransactionTypeDTO> IdToTransactionTypeDictionary { get; set; } = new Dictionary<Guid, TransactionTypeDTO>();
 
     protected async override Task OnAfterRenderAsync(bool firstrender)
     {
         if (firstrender)
         {
-            TransactionTypes = await TransactionTypeService.GetAllAsync();
+            var transactionTypeList = await TransactionTypeService.GetAllAsync();
+            IdToTransactionTypeDictionary = transactionTypeList.ToDictionary(e => e.Id);
         }
     }
 

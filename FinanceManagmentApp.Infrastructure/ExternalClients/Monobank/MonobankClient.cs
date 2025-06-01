@@ -1,5 +1,6 @@
 ﻿using FinanceManagmentApp.Domain.Entities;
 using FinanceManagmentApp.ExternalClients.Abstractions;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
@@ -43,7 +44,17 @@ namespace FinanceManagmentApp.Infrastructure.ExternalClients.Monobank
         private async Task<IEnumerable<MonobankTransactionResponseDTO>?> GetTransactions(string uri)
         {
             var response = await _httpClient.GetAsync(uri);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    throw new HttpRequestException("Access forbiden. It looks like something is up with your Monobank API token.");
+                }
+                else
+                {
+                    throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode}");
+                }
+            }
 
             return await response.Content.ReadFromJsonAsync<IEnumerable<MonobankTransactionResponseDTO>>();
         }

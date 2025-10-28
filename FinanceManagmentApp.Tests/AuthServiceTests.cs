@@ -72,7 +72,8 @@ namespace FinanceManagmentApp.Tests
                 Username = "newuser",
                 Email = "newuser@example.com",
                 PlainPassword = "password",
-                DisplayName = "New User"
+                DisplayName = "New User",
+                MonobankApiToken = "token"
             };
 
             _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))

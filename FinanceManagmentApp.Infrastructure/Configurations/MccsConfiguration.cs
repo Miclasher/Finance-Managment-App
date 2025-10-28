@@ -8,6 +8,8 @@ namespace FinanceManagmentApp.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Mcc> builder)
         {
+            builder.ToTable("Mcc");
+
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Value)

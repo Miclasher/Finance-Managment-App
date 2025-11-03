@@ -2,7 +2,7 @@
 
 FinTrack is a comprehensive personal finance management application designed to help you track your income and expenses, gain insights into your spending habits, and manage your financial health effectively. Built with .NET 8, Blazor, and a Web API backend, it offers a modern and responsive user experience.
 
-## ✨ Features
+## Features
 
 *   **Secure Authentication:** JWT-based authentication for user sign-up and sign-in.
 *   **Transaction Management:** Create, view, and manage different types of financial transactions.
@@ -13,7 +13,7 @@ FinTrack is a comprehensive personal finance management application designed to 
 *   **Monobank Integration:** Seamlessly import your transaction history from your Monobank account.
 *   **Responsive UI:** A clean and intuitive user interface built with Blazor.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Frontend:** Blazor Server (.NET 8)
 *   **Backend:** ASP.NET Core Web API (.NET 8)
@@ -21,7 +21,7 @@ FinTrack is a comprehensive personal finance management application designed to 
 *   **Authentication:** JSON Web Tokens (JWT)
 *   **API Documentation:** Swagger (OpenAPI)
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -84,6 +84,6 @@ Follow these instructions to get a copy of the project up and running on your lo
     *   Go to **Common Properties > Startup Project**.
     *   Select **Multiple startup projects** and set the Action for both `Fintrack.WebAPI` and `Fintrack.Frontend` to **Start**.
 
-## 📖 API Documentation
+## API Documentation
 
 Once the `Fintrack.WebAPI` project is running, you can access the Swagger UI for interactive API documentation and testing. Navigate to `/swagger` in your browser (e.g., `https://localhost:7123/swagger`).

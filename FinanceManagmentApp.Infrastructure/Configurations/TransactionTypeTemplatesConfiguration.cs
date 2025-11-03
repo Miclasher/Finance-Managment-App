@@ -2,23 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace FinanceManagmentApp.Infrastructure.Configurations
+namespace FinanceManagmentApp.Infrastructure.Configurations;
+
+internal sealed class TransactionTypeTemplatesConfiguration : IEntityTypeConfiguration<TransactionTypeTemplate>
 {
-    internal sealed class TransactionTypeTemplatesConfiguration : IEntityTypeConfiguration<TransactionTypeTemplate>
+    public void Configure(EntityTypeBuilder<TransactionTypeTemplate> builder)
     {
-        public void Configure(EntityTypeBuilder<TransactionTypeTemplate> builder)
-        {
-            builder.HasKey(e => e.Id);
+        builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(50);
+        builder.Property(e => e.Name)
+            .IsRequired()
+            .HasMaxLength(50);
 
-            builder.Property(e => e.IsExpense)
-                .IsRequired();
+        builder.Property(e => e.IsExpense)
+            .IsRequired();
 
-            builder.HasMany(e => e.Mccs)
-                .WithMany(e => e.TransactionTypeTemplates);
-        }
+        builder.HasMany(e => e.Mccs)
+            .WithMany(e => e.TransactionTypeTemplates);
     }
 }

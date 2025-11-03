@@ -5,125 +5,128 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace FinanceManagmentApp.Frontend.Services
+namespace FinanceManagmentApp.Frontend.Services;
+
+internal sealed class AuthService : IAuthService
 {
-    internal sealed class AuthService : IAuthService
+    private readonly HttpClient _httpClient;
+    private readonly IJSRuntime _jsRuntime;
+    private readonly AuthenticationStateProvider _authStateProvider;
+
+    private const string RefreshTokenKey = "refreshToken";
+    private const string AccessTokenKey = "accessToken";
+
+    public AuthService(IHttpClientFactory httpClientFactory, AuthenticationStateProvider authStateProvider, IJSRuntime jsRuntime)
     {
-        private readonly HttpClient _httpClient;
-        private readonly IJSRuntime _jsRuntime;
-        private readonly AuthenticationStateProvider _authStateProvider;
+        _httpClient = httpClientFactory.CreateClient("FinanceManagmentAppAPI");
+        _authStateProvider = authStateProvider;
+        _jsRuntime = jsRuntime;
+    }
 
-        private const string RefreshTokenKey = "refreshToken";
-        private const string AccessTokenKey = "accessToken";
+    public async Task LoginAsync(UserLoginDTO userLogin)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/Auth/login", userLogin);
 
-        public AuthService(IHttpClientFactory httpClientFactory, AuthenticationStateProvider authStateProvider, IJSRuntime jsRuntime)
+        await response.CustomEnsureSuccessStatusCode();
+
+        var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
+
+        if (authResponse is not null)
         {
-            _httpClient = httpClientFactory.CreateClient("FinanceManagmentAppAPI");
-            _authStateProvider = authStateProvider;
-            _jsRuntime = jsRuntime;
-        }
-
-        public async Task LoginAsync(UserLoginDTO userLogin)
-        {
-            var response = await _httpClient.PostAsJsonAsync("api/Auth/login", userLogin);
-
-            await response.CustomEnsureSuccessStatusCode();
-
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
-
-            if (authResponse is null)
-            {
-                throw new InvalidDataException("Failed to get auth response from server response.");
-            }
-
             await SaveTokens(authResponse);
             (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
         }
-
-        public async Task RegisterAsync(UserRegisterDTO userRegister)
+        else
         {
-            var response = await _httpClient.PostAsJsonAsync("api/Auth/register", userRegister);
+            throw new InvalidDataException("Failed to get auth response from server response.");
+        }
+    }
 
-            await response.CustomEnsureSuccessStatusCode();
+    public async Task RegisterAsync(UserRegisterDTO userRegister)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/Auth/register", userRegister);
 
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
+        await response.CustomEnsureSuccessStatusCode();
 
-            if (authResponse is null)
-            {
-                throw new InvalidDataException("Failed to get auth response from server response.");
-            }
+        var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
 
+        if (authResponse is not null)
+        {
             await SaveTokens(authResponse);
             (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
         }
-
-        public async Task<string> RefreshTokenAsync()
+        else
         {
-            var refreshToken = await GetRefreshToken();
+            throw new InvalidDataException("Failed to get auth response from server response.");
+        }
+    }
 
-            if (string.IsNullOrEmpty(refreshToken))
-            {
-                await LogoutAsync();
-                throw new UnauthorizedAccessException("Refresh token is missing.");
-            }
+    public async Task<string> RefreshTokenAsync()
+    {
+        var refreshToken = await GetRefreshToken();
 
-            var response = await _httpClient.PostAsJsonAsync("api/Auth/loginWithRefreshToken", refreshToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                await LogoutAsync();
-                throw new HttpRequestException("Failed to refresh token.");
-            }
-
-            var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
-
-            if (authResponse is null)
-            {
-                await LogoutAsync();
-                throw new InvalidDataException("Failed to get auth response from server response.");
-            }
-
-            await SaveTokens(authResponse);
-            (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
-
-            return authResponse.AccessToken;
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            await LogoutAsync();
+            throw new UnauthorizedAccessException("Refresh token is missing.");
         }
 
-        public async Task LogoutAsync()
+        var response = await _httpClient.PostAsJsonAsync("api/Auth/loginWithRefreshToken", refreshToken);
+
+        if (!response.IsSuccessStatusCode)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", RefreshTokenKey);
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", AccessTokenKey);
-            (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogout();
+            await LogoutAsync();
+            throw new HttpRequestException("Failed to refresh token.");
         }
 
-        public async Task<string> GetAccessTokenAsync()
+        var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDTO>();
+
+        if (authResponse is null)
         {
-            var accessToken = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", AccessTokenKey);
-
-            if (string.IsNullOrEmpty(accessToken) || IsTokenExpired(accessToken))
-            {
-                return await RefreshTokenAsync();
-            }
-
-            return accessToken;
+            await LogoutAsync();
+            throw new InvalidDataException("Failed to get auth response from server response.");
         }
 
-        private async Task SaveTokens(AuthResponseDTO authResponse)
+        await SaveTokens(authResponse);
+        (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogin(authResponse.AccessToken);
+
+        return authResponse.AccessToken;
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", RefreshTokenKey);
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", AccessTokenKey);
+        (_authStateProvider as CustomAuthenticationStateProvider)!.NotifyUserLogout();
+    }
+
+    public async Task<string> GetAccessTokenAsync()
+    {
+        var accessToken = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", AccessTokenKey);
+
+        if (string.IsNullOrEmpty(accessToken) || IsTokenExpired(accessToken))
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", AccessTokenKey, authResponse.AccessToken);
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", RefreshTokenKey, authResponse.RefreshToken);
+            return await RefreshTokenAsync();
         }
 
-        private static bool IsTokenExpired(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-            return jwtToken.ValidTo < DateTime.UtcNow;
-        }
+        return accessToken;
+    }
 
-        private async Task<string> GetRefreshToken()
-        {
-            return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", RefreshTokenKey);
-        }
+    private async Task SaveTokens(AuthResponseDTO authResponse)
+    {
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", AccessTokenKey, authResponse.AccessToken);
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", RefreshTokenKey, authResponse.RefreshToken);
+    }
+
+    private static bool IsTokenExpired(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        return jwtToken.ValidTo < DateTime.UtcNow;
+    }
+
+    private async Task<string> GetRefreshToken()
+    {
+        return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", RefreshTokenKey);
     }
 }

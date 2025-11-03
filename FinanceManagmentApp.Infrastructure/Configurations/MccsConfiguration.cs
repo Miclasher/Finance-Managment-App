@@ -2,24 +2,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace FinanceManagmentApp.Infrastructure.Configurations
+namespace FinanceManagmentApp.Infrastructure.Configurations;
+
+internal sealed class MccsConfiguration : IEntityTypeConfiguration<Mcc>
 {
-    internal sealed class MccsConfiguration : IEntityTypeConfiguration<Mcc>
+    public void Configure(EntityTypeBuilder<Mcc> builder)
     {
-        public void Configure(EntityTypeBuilder<Mcc> builder)
-        {
-            builder.ToTable("Mcc");
+        builder.ToTable("Mcc");
 
-            builder.HasKey(e => e.Id);
+        builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Value)
-                .IsRequired();
+        builder.Property(e => e.Value)
+            .IsRequired();
 
-            builder.HasMany(e => e.TransactionTypes)
-                .WithMany(e => e.Mccs);
+        builder.HasMany(e => e.TransactionTypes)
+            .WithMany(e => e.Mccs);
 
-            builder.HasMany(e => e.TransactionTypeTemplates)
-                .WithMany(e => e.Mccs);
-        }
+        builder.HasMany(e => e.TransactionTypeTemplates)
+            .WithMany(e => e.Mccs);
     }
 }

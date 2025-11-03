@@ -6,47 +6,46 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FinanceManagmentApp.Services.Utilities
+namespace FinanceManagmentApp.Services.Utilities;
+
+public sealed class JwtUtility : IJwtUtility
 {
-    public sealed class JwtUtility : IJwtUtility
+    private readonly IConfiguration _configuration;
+
+    public JwtUtility(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public JwtUtility(IConfiguration configuration)
+    public string GenerateAccessToken(Guid userId)
+    {
+        if (_configuration["Jwt:Key"] is null || _configuration["Jwt:Audience"] is null || _configuration["Jwt:Issuer"] is null)
         {
-            _configuration = configuration;
+            throw new InvalidOperationException("Cannot generate acces token because of missing Jwt configuration.");
         }
 
-        public string GenerateAccessToken(Guid userId)
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
         {
-            if (_configuration["Jwt:Key"] is null || _configuration["Jwt:Audience"] is null || _configuration["Jwt:Issuer"] is null)
-            {
-                throw new InvalidOperationException("Cannot generate acces token because of missing Jwt configuration.");
-            }
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+        };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(30),
+            signingCredentials: credentials
+            );
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
-                signingCredentials: credentials
-                );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public string GenerateRefreshToken()
-        {
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-        }
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

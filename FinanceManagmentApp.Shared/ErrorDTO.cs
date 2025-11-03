@@ -1,7 +1,6 @@
-﻿namespace FinanceManagmentApp.Shared
+﻿namespace FinanceManagmentApp.Shared;
+
+public sealed class ErrorDTO
 {
-    public sealed class ErrorDTO
-    {
-        public string Error { get; set; } = string.Empty;
-    }
+    public string Error { get; set; } = string.Empty;
 }

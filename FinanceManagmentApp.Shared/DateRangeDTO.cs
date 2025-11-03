@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FinanceManagmentApp.Shared
+namespace FinanceManagmentApp.Shared;
+
+public sealed class DateRangeDTO
 {
-    public sealed class DateRangeDTO
-    {
-        [Required]
-        public DateOnly StartDate { get; set; }
-        [Required]
-        public DateOnly EndDate { get; set; }
-    }
+    [Required]
+    public DateOnly StartDate { get; set; }
+    [Required]
+    public DateOnly EndDate { get; set; }
 }

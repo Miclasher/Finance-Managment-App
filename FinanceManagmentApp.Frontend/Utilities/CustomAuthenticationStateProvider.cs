@@ -2,32 +2,31 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace FinanceManagmentApp.Frontend.Utilities
+namespace FinanceManagmentApp.Frontend.Utilities;
+
+public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    public class CustomAuthenticationStateProvider : AuthenticationStateProvider
+    private ClaimsPrincipal _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+
+    public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        private ClaimsPrincipal _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+        return Task.FromResult(new AuthenticationState(_currentUser));
+    }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
-        {
-            return Task.FromResult(new AuthenticationState(_currentUser));
-        }
+    public void NotifyUserLogin(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
 
-        public void NotifyUserLogin(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
+        _currentUser = new ClaimsPrincipal(identity);
 
-            var identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
-            _currentUser = new ClaimsPrincipal(identity);
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
+    }
 
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
-        }
-
-        public void NotifyUserLogout()
-        {
-            _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
-        }
+    public void NotifyUserLogout()
+    {
+        _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
     }
 }

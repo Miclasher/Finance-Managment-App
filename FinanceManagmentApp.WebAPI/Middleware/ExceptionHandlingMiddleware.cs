@@ -1,41 +1,40 @@
 ﻿using FinanceManagmentApp.Shared;
 using System.Text.Json;
 
-namespace FinanceManagmentApp.WebAPI.Middleware
+namespace FinanceManagmentApp.WebAPI.Middleware;
+
+internal sealed class ExceptionHandlingMiddleware : IMiddleware
 {
-    internal sealed class ExceptionHandlingMiddleware : IMiddleware
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        try
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception e)
-            {
-                await HandleExceptionAsync(context, e);
-            }
+            await next(context);
         }
-
-        private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+        catch (Exception e)
         {
-            httpContext.Response.ContentType = "application/json";
-
-            httpContext.Response.StatusCode = exception switch
-            {
-                ArgumentNullException => StatusCodes.Status400BadRequest,
-                InvalidOperationException => StatusCodes.Status400BadRequest,
-                AccessViolationException => StatusCodes.Status403Forbidden,
-                KeyNotFoundException => StatusCodes.Status404NotFound,
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            var response = new ErrorDTO
-            {
-                Error = exception.Message
-            };
-
-            await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
+            await HandleExceptionAsync(context, e);
         }
+    }
+
+    private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+    {
+        httpContext.Response.ContentType = "application/json";
+
+        httpContext.Response.StatusCode = exception switch
+        {
+            ArgumentNullException => StatusCodes.Status400BadRequest,
+            InvalidOperationException => StatusCodes.Status400BadRequest,
+            AccessViolationException => StatusCodes.Status403Forbidden,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        var response = new ErrorDTO
+        {
+            Error = exception.Message
+        };
+
+        await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 }

@@ -4,68 +4,67 @@ using FinanceManagmentApp.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceManagmentApp.WebAPI.Controllers
+namespace FinanceManagmentApp.WebAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class TransactionTypeController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class TransactionTypeController : ControllerBase
+    private readonly ITransactionTypeService _transactionTypeService;
+
+    public TransactionTypeController(ITransactionTypeService transactionTypeeService)
     {
-        private readonly ITransactionTypeService _transactionTypeService;
+        _transactionTypeService = transactionTypeeService;
+    }
 
-        public TransactionTypeController(ITransactionTypeService transactionTypeeService)
-        {
-            _transactionTypeService = transactionTypeeService;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<TransactionTypeDTO>>> GetAll()
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionTypeDTO>>> GetAll()
-        {
-            var userId = User.GetUserIdFromJwt();
+        var trTypes = await _transactionTypeService.GetAllAsync(userId);
 
-            var trTypes = await _transactionTypeService.GetAllAsync(userId);
+        return Ok(trTypes);
+    }
 
-            return Ok(trTypes);
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<TransactionTypeDTO>> GetById(Guid id)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TransactionTypeDTO>> GetById(Guid id)
-        {
-            var userId = User.GetUserIdFromJwt();
+        var trType = await _transactionTypeService.GetByIdAsync(userId, id);
 
-            var trType = await _transactionTypeService.GetByIdAsync(userId, id);
+        return Ok(trType);
+    }
 
-            return Ok(trType);
-        }
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(Guid id)
-        {
-            var userId = User.GetUserIdFromJwt();
+        await _transactionTypeService.DeleteAsync(userId, id);
 
-            await _transactionTypeService.DeleteAsync(userId, id);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPut]
+    public async Task<ActionResult> Update(TransactionTypeDTO transactionType)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpPut]
-        public async Task<ActionResult> Update(TransactionTypeDTO transactionType)
-        {
-            var userId = User.GetUserIdFromJwt();
+        await _transactionTypeService.UpdateAsync(userId, transactionType);
 
-            await _transactionTypeService.UpdateAsync(userId, transactionType);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Create(TransactionTypeForCreateDTO transactionType)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpPost]
-        public async Task<ActionResult<Guid>> Create(TransactionTypeForCreateDTO transactionType)
-        {
-            var userId = User.GetUserIdFromJwt();
+        var newTransTypeid = await _transactionTypeService.CreateAsync(userId, transactionType);
 
-            var newTransTypeid = await _transactionTypeService.CreateAsync(userId, transactionType);
-
-            return Ok(newTransTypeid);
-        }
+        return Ok(newTransTypeid);
     }
 }

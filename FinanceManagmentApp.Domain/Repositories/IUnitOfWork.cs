@@ -1,7 +1,6 @@
-﻿namespace FinanceManagmentApp.Domain.Repositories
+﻿namespace FinanceManagmentApp.Domain.Repositories;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-    }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

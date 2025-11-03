@@ -1,8 +1,7 @@
-﻿namespace FinanceManagmentApp.Services.Abstractions
+﻿namespace FinanceManagmentApp.Services.Abstractions;
+
+public interface IJwtUtility
 {
-    public interface IJwtUtility
-    {
-        string GenerateAccessToken(Guid userId);
-        string GenerateRefreshToken();
-    }
+    string GenerateAccessToken(Guid userId);
+    string GenerateRefreshToken();
 }

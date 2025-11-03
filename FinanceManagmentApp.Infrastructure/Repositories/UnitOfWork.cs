@@ -1,19 +1,18 @@
 ﻿using FinanceManagmentApp.Domain.Repositories;
 
-namespace FinanceManagmentApp.Infrastructure.Repositories
+namespace FinanceManagmentApp.Infrastructure.Repositories;
+
+internal sealed class UnitOfWork : IUnitOfWork
 {
-    internal sealed class UnitOfWork : IUnitOfWork
+    private readonly FinanceManagmentAppContext _context;
+
+    public UnitOfWork(FinanceManagmentAppContext context)
     {
-        private readonly FinanceManagmentAppContext _context;
+        _context = context;
+    }
 
-        public UnitOfWork(FinanceManagmentAppContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.SaveChangesAsync(cancellationToken);
-        }
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 }

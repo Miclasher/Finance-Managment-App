@@ -2,61 +2,60 @@
 using FinanceManagmentApp.Frontend.Utilities;
 using System.Net.Http.Headers;
 
-namespace FinanceManagmentApp.Frontend.Services
+namespace FinanceManagmentApp.Frontend.Services;
+
+internal abstract class BaseService
 {
-    internal abstract class BaseService
+    private protected readonly HttpClient _httpClient;
+    private protected readonly IAuthService _authService;
+
+    protected BaseService(IHttpClientFactory httpClientFactory, IAuthService authService)
     {
-        private protected readonly HttpClient _httpClient;
-        private protected readonly IAuthService _authService;
+        _httpClient = httpClientFactory.CreateClient("FinanceManagmentAppAPI");
+        _authService = authService;
+    }
 
-        protected BaseService(IHttpClientFactory httpClientFactory, IAuthService authService)
+    private protected async Task AddAuthorizationHeaderAsync()
+    {
+        var token = await _authService.GetAccessTokenAsync();
+        if (!string.IsNullOrEmpty(token))
         {
-            _httpClient = httpClientFactory.CreateClient("FinanceManagmentAppAPI");
-            _authService = authService;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
+    }
 
-        private protected async Task AddAuthorizationHeaderAsync()
+    private protected async Task<HttpResponseMessage> SendAsync(string url, HttpMethod method)
+    {
+        return await SendAsync<object>(url, method, null!);
+    }
+
+    private protected async Task<HttpResponseMessage> SendAsync<T>(string url, HttpMethod method, T data)
+    {
+        await AddAuthorizationHeaderAsync();
+
+        var response = await _httpClient.SendAsync(new HttpRequestMessage()
         {
-            var token = await _authService.GetAccessTokenAsync();
-            if (!string.IsNullOrEmpty(token))
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
-        }
+            Method = method,
+            RequestUri = new Uri(url, UriKind.Relative),
+            Content = data == null ? null : JsonContent.Create(data, mediaType: null)
+        });
 
-        private protected async Task<HttpResponseMessage> SendAsync(string url, HttpMethod method)
-        {
-            return await SendAsync<object>(url, method, null!);
-        }
+        await response.CustomEnsureSuccessStatusCode();
 
-        private protected async Task<HttpResponseMessage> SendAsync<T>(string url, HttpMethod method, T data)
-        {
-            await AddAuthorizationHeaderAsync();
+        return response;
+    }
 
-            var response = await _httpClient.SendAsync(new HttpRequestMessage()
-            {
-                Method = method,
-                RequestUri = new Uri(url, UriKind.Relative),
-                Content = data == null ? null : JsonContent.Create(data, mediaType: null)
-            });
+    private protected async Task<T?> SendAsync<T>(string url, HttpMethod method)
+    {
+        var response = await SendAsync<T>(url, method, default!);
 
-            await response.CustomEnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<T>();
+    }
 
-            return response;
-        }
+    private protected async Task<T?> SendAsync<T, R>(string url, HttpMethod method, R data)
+    {
+        var response = await SendAsync(url, method, data);
 
-        private protected async Task<T?> SendAsync<T>(string url, HttpMethod method)
-        {
-            var response = await SendAsync<T>(url, method, default!);
-
-            return await response.Content.ReadFromJsonAsync<T>();
-        }
-
-        private protected async Task<T?> SendAsync<T, R>(string url, HttpMethod method, R data)
-        {
-            var response = await SendAsync(url, method, data);
-
-            return await response.Content.ReadFromJsonAsync<T>();
-        }
+        return await response.Content.ReadFromJsonAsync<T>();
     }
 }

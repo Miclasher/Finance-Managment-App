@@ -1,9 +1,8 @@
 ﻿using FinanceManagmentApp.Shared;
 
-namespace FinanceManagmentApp.Frontend.Services.Abstractions
+namespace FinanceManagmentApp.Frontend.Services.Abstractions;
+
+public interface IMonobankImportService
 {
-    public interface IMonobankImportService
-    {
-        Task<SummaryDTO> ImportFromMonobankAsync(DateRangeDTO dateRange);
-    }
+    Task<SummaryDTO> ImportFromMonobankAsync(DateRangeDTO dateRange);
 }

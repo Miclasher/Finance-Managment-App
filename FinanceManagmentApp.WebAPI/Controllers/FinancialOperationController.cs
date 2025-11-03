@@ -4,68 +4,67 @@ using FinanceManagmentApp.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceManagmentApp.WebAPI.Controllers
+namespace FinanceManagmentApp.WebAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class FinancialOperationController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class FinancialOperationController : ControllerBase
+    private readonly IFinancialOperationService _financialOperationService;
+
+    public FinancialOperationController(IFinancialOperationService financialOperationService)
     {
-        private readonly IFinancialOperationService _financialOperationService;
+        _financialOperationService = financialOperationService;
+    }
 
-        public FinancialOperationController(IFinancialOperationService financialOperationService)
-        {
-            _financialOperationService = financialOperationService;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<FinancialOperationDTO>>> GetAll()
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FinancialOperationDTO>>> GetAll()
-        {
-            var userId = User.GetUserIdFromJwt();
+        var finOps = await _financialOperationService.GetAllAsync(userId);
 
-            var finOps = await _financialOperationService.GetAllAsync(userId);
+        return Ok(finOps);
+    }
 
-            return Ok(finOps);
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<FinancialOperationDTO>> GetById(Guid id)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FinancialOperationDTO>> GetById(Guid id)
-        {
-            var userId = User.GetUserIdFromJwt();
+        var finOp = await _financialOperationService.GetByIdAsync(userId, id);
 
-            var finOp = await _financialOperationService.GetByIdAsync(userId, id);
+        return Ok(finOp);
+    }
 
-            return Ok(finOp);
-        }
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Create([FromBody] FinancialOperationForCreateDTO financialOperation)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpPost]
-        public async Task<ActionResult<Guid>> Create([FromBody] FinancialOperationForCreateDTO financialOperation)
-        {
-            var userId = User.GetUserIdFromJwt();
+        var newFinOpId = await _financialOperationService.CreateAsync(userId, financialOperation);
 
-            var newFinOpId = await _financialOperationService.CreateAsync(userId, financialOperation);
+        return Ok(newFinOpId);
+    }
 
-            return Ok(newFinOpId);
-        }
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] FinancialOperationDTO financialOperation)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] FinancialOperationDTO financialOperation)
-        {
-            var userId = User.GetUserIdFromJwt();
+        await _financialOperationService.UpdateAsync(userId, financialOperation);
 
-            await _financialOperationService.UpdateAsync(userId, financialOperation);
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = User.GetUserIdFromJwt();
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var userId = User.GetUserIdFromJwt();
+        await _financialOperationService.DeleteAsync(userId, id);
 
-            await _financialOperationService.DeleteAsync(userId, id);
-
-            return Ok();
-        }
+        return Ok();
     }
 }

@@ -5,106 +5,105 @@ using FinanceManagmentApp.Services.Utilities;
 using FinanceManagmentApp.Shared;
 using Moq;
 
-namespace FinanceManagmentApp.Tests
+namespace FinanceManagmentApp.Tests;
+
+[TestClass]
+public class AuthServiceTests : ServiceTestsBase
 {
-    [TestClass]
-    public class AuthServiceTests : ServiceTestsBase
+    private Mock<IJwtUtility> _mockJwtUtility = null!;
+    private AuthService _authService = null!;
+
+    [TestInitialize]
+    public void TestInitialize()
     {
-        private Mock<IJwtUtility> _mockJwtUtility = null!;
-        private AuthService _authService = null!;
+        _mockJwtUtility = new Mock<IJwtUtility>();
+        _authService = new AuthService(_mockJwtUtility.Object, _mockRepositoryManager.Object);
+    }
 
-        [TestInitialize]
-        public void TestInitialize()
+    [TestMethod]
+    public async Task LoginAsyncTest1()
+    {
+        var userLoginDto = new UserLoginDTO { Username = "testuser", Password = "password" };
+        var user = new User
         {
-            _mockJwtUtility = new Mock<IJwtUtility>();
-            _authService = new AuthService(_mockJwtUtility.Object, _mockRepositoryManager.Object);
-        }
+            Id = Guid.NewGuid(),
+            Username = "testuser",
+            PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
+            Salt = "somesalt"
+        };
 
-        [TestMethod]
-        public async Task LoginAsyncTest1()
+        _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockJwtUtility.Setup(j => j.GenerateAccessToken(user.Id))
+            .Returns("accessToken");
+        _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
+            .Returns("refreshToken");
+
+        var result = await _authService.LoginAsync(userLoginDto);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("accessToken", result.AccessToken);
+        Assert.AreEqual("refreshToken", result.RefreshToken);
+    }
+
+    [TestMethod]
+    public async Task LoginAsyncTest2()
+    {
+        var userLoginDto = new UserLoginDTO { Username = "testuser", Password = "wrongpassword" };
+        var user = new User
         {
-            var userLoginDto = new UserLoginDTO { Username = "testuser", Password = "password" };
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = "testuser",
-                PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
-                Salt = "somesalt"
-            };
+            Id = Guid.NewGuid(),
+            Username = "testuser",
+            PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
+            Salt = "somesalt",
+        };
 
-            _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(user);
-            _mockJwtUtility.Setup(j => j.GenerateAccessToken(user.Id))
-                .Returns("accessToken");
-            _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
-                .Returns("refreshToken");
+        _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
 
-            var result = await _authService.LoginAsync(userLoginDto);
+        await Assert.ThrowsExceptionAsync<InvalidDataException>(() => _authService.LoginAsync(userLoginDto));
+    }
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual("accessToken", result.AccessToken);
-            Assert.AreEqual("refreshToken", result.RefreshToken);
-        }
-
-        [TestMethod]
-        public async Task LoginAsyncTest2()
+    [TestMethod]
+    public async Task RegisterAsyncTest1()
+    {
+        var userRegisterDto = new UserRegisterDTO
         {
-            var userLoginDto = new UserLoginDTO { Username = "testuser", Password = "wrongpassword" };
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = "testuser",
-                PasswordHash = HashUtility.HashPassword("password", Convert.FromBase64String("somesalt")),
-                Salt = "somesalt",
-            };
+            Username = "newuser",
+            Email = "newuser@example.com",
+            PlainPassword = "password",
+            DisplayName = "New User",
+            MonobankApiToken = "token"
+        };
 
-            _mockRepositoryManager.Setup(r => r.User.GetByUsernameAsync(userLoginDto.Username, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(user);
+        _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        _mockJwtUtility.Setup(j => j.GenerateAccessToken(It.IsAny<Guid>()))
+            .Returns("accessToken");
+        _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
+            .Returns("refreshToken");
 
-            await Assert.ThrowsExceptionAsync<InvalidDataException>(() => _authService.LoginAsync(userLoginDto));
-        }
+        var result = await _authService.RegisterAsync(userRegisterDto);
 
-        [TestMethod]
-        public async Task RegisterAsyncTest1()
+        Assert.IsNotNull(result);
+        Assert.AreEqual("accessToken", result.AccessToken);
+        Assert.AreEqual("refreshToken", result.RefreshToken);
+    }
+
+    [TestMethod]
+    public async Task RegisterAsyncTest2()
+    {
+        var userRegisterDto = new UserRegisterDTO
         {
-            var userRegisterDto = new UserRegisterDTO
-            {
-                Username = "newuser",
-                Email = "newuser@example.com",
-                PlainPassword = "password",
-                DisplayName = "New User",
-                MonobankApiToken = "token"
-            };
+            Username = "existinguser",
+            Email = "existinguser@example.com",
+            PlainPassword = "password",
+            DisplayName = "Existing User"
+        };
 
-            _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
-            _mockJwtUtility.Setup(j => j.GenerateAccessToken(It.IsAny<Guid>()))
-                .Returns("accessToken");
-            _mockJwtUtility.Setup(j => j.GenerateRefreshToken())
-                .Returns("refreshToken");
+        _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
-            var result = await _authService.RegisterAsync(userRegisterDto);
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual("accessToken", result.AccessToken);
-            Assert.AreEqual("refreshToken", result.RefreshToken);
-        }
-
-        [TestMethod]
-        public async Task RegisterAsyncTest2()
-        {
-            var userRegisterDto = new UserRegisterDTO
-            {
-                Username = "existinguser",
-                Email = "existinguser@example.com",
-                PlainPassword = "password",
-                DisplayName = "Existing User"
-            };
-
-            _mockRepositoryManager.Setup(r => r.User.UsernameExistsAsync(userRegisterDto.Username, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _authService.RegisterAsync(userRegisterDto));
-        }
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _authService.RegisterAsync(userRegisterDto));
     }
 }

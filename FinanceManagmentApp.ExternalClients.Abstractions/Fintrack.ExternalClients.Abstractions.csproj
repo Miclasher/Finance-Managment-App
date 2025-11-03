@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinanceManagmentApp.Shared\FinanceManagmentApp.Shared.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Domain\Fintrack.Domain.csproj" />
   </ItemGroup>
 
 </Project>

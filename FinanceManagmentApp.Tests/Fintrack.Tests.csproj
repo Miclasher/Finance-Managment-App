@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinanceManagmentApp.Domain\FinanceManagmentApp.Domain.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.Services.Abstractions\FinanceManagmentApp.Services.Abstractions.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.Services\FinanceManagmentApp.Services.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Domain\Fintrack.Domain.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Services.Abstractions\Fintrack.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Services\Fintrack.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

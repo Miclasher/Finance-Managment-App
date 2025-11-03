@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinanceManagmentApp.Domain\FinanceManagmentApp.Domain.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.ExternalClients.Abstractions\FinanceManagmentApp.ExternalClients.Abstractions.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Domain\Fintrack.Domain.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.ExternalClients.Abstractions\Fintrack.ExternalClients.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

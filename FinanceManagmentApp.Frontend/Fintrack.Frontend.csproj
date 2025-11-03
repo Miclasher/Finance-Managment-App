@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinanceManagmentApp.Shared\FinanceManagmentApp.Shared.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Shared\Fintrack.Shared.csproj" />
   </ItemGroup>
 
 </Project>

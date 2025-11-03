@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "FinanceManagmentApp.WebAPI\\Fintrack.WebAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FinanceManagmentApp.Frontend\\Fintrack.Frontend.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

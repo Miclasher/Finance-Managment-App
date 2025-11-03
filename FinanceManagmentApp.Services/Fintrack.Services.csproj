@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinanceManagmentApp.Domain\FinanceManagmentApp.Domain.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.ExternalClients.Abstractions\FinanceManagmentApp.ExternalClients.Abstractions.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.Services.Abstractions\FinanceManagmentApp.Services.Abstractions.csproj" />
-    <ProjectReference Include="..\FinanceManagmentApp.Shared\FinanceManagmentApp.Shared.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Domain\Fintrack.Domain.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.ExternalClients.Abstractions\Fintrack.ExternalClients.Abstractions.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Services.Abstractions\Fintrack.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\FinanceManagmentApp.Shared\Fintrack.Shared.csproj" />
   </ItemGroup>
 
 </Project>

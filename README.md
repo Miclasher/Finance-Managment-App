@@ -39,10 +39,10 @@ Follow these instructions to get a copy of the project up and running on your lo
     cd Fintrack
     ```
 
-2.  **Configure Backend (`FinanceManagmentApp.WebAPI`):**
-    The backend requires a database connection string фтв JWT settings.
+2.  **Configure Backend (`Fintrack.WebAPI`):**
+    The backend requires a database connection string and JWT settings.
 
-    *   Right-click the `FinanceManagmentApp.WebAPI` project in Visual Studio and select **Manage User Secrets**.
+    *   Right-click the `Fintrack.WebAPI` project in Visual Studio and select **Manage User Secrets**.
     *   Add the following configuration to the `secrets.json` file:
 
     ```json
@@ -58,10 +58,10 @@ Follow these instructions to get a copy of the project up and running on your lo
     }
     ```
 
-3.  **Configure Frontend (`FinanceManagmentApp.Frontend`):**
+3.  **Configure Frontend (`Fintrack.Frontend`):**
     The frontend needs to know the base URL of the backend API.
 
-    *   Open the `appsettings.json` file in the `FinanceManagmentApp.Frontend` project.
+    *   Open the `appsettings.json` file in the `Fintrack.Frontend` project.
     *   Set the `ApiBaseUrl` to the address of your running backend API. For local development, this is typically the HTTPS address from the `launchSettings.json` of the WebAPI project.
 
     ```json
@@ -72,18 +72,18 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 4.  **Apply Database Migrations:**
     *   Open the Package Manager Console in Visual Studio (__View > Other Windows > Package Manager Console__).
-    *   Set the `FinanceManagmentApp.Infrastructure` project as the default project.
+    *   Set the `Fintrack.Infrastructure` project as the default project.
     *   Run the `Update-Database` command to create the database schema.
 
 ### Running the Application
 
-1.  Set the `FinanceManagmentApp.WebAPI` project as the startup project and run it (F5 or Ctrl+F5). This will launch the backend API.
-2.  Set the `FinanceManagmentApp.Frontend` project as the startup project and run it.
+1.  Set the `Fintrack.WebAPI` project as the startup project and run it (F5 or Ctrl+F5). This will launch the backend API.
+2.  Set the `Fintrack.Frontend` project as the startup project and run it.
 3.  Alternatively, you can configure the solution to start both projects simultaneously:
     *   Right-click the solution in Solution Explorer and select **Properties**.
     *   Go to **Common Properties > Startup Project**.
-    *   Select **Multiple startup projects** and set the Action for both `FinanceManagmentApp.WebAPI` and `FinanceManagmentApp.Frontend` to **Start**.
+    *   Select **Multiple startup projects** and set the Action for both `Fintrack.WebAPI` and `Fintrack.Frontend` to **Start**.
 
 ## 📖 API Documentation
 
-Once the `FinanceManagmentApp.WebAPI` project is running, you can access the Swagger UI for interactive API documentation and testing. Navigate to `/swagger` in your browser (e.g., `https://localhost:7123/swagger`).
+Once the `Fintrack.WebAPI` project is running, you can access the Swagger UI for interactive API documentation and testing. Navigate to `/swagger` in your browser (e.g., `https://localhost:7123/swagger`).

@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
         public int Value { get; set; }
 
-        public IEnumerable<TransactionType> TransactionTypes = new List<TransactionType>();
-        public IEnumerable<TransactionTypeTemplate> TransactionTypeTemplates = new List<TransactionTypeTemplate>();
+        public IEnumerable<TransactionType> TransactionTypes { get; set; } = new List<TransactionType>();
+        public IEnumerable<TransactionTypeTemplate> TransactionTypeTemplates { get; set; } = new List<TransactionTypeTemplate>();
     }
 }
